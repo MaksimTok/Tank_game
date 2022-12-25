@@ -5,18 +5,16 @@ from classes import *
 
 if __name__ == '__main__':
     pygame.init()
-    pygame.display.set_caption('Инициализация игры')
+    pygame.display.set_caption('Battle city')
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
-    board = Board(10, 10)
-    board.set_view(100, 100, 50)
     running = True
+    tank = Tank('Type1', 100, 100, all_sprites)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                board.get_click(event.pos)
         screen.fill((0, 0, 0))
-        board.render(screen)
+        all_sprites.draw(screen)
+        all_sprites.update()
         pygame.display.flip()

@@ -1,4 +1,18 @@
 import pygame
+import os
+import sys
+
+all_sprites = pygame.sprite.Group()
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('Sprites', name)
+    # если файл не существует, то выходим
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    return image
 
 
 class Board:
@@ -46,37 +60,14 @@ class Board:
         self.on_click(self.get_cell(mouse_pos))
 
 
-class Tank:
-    pass
+class Tank(pygame.sprite.Sprite):
 
+    def __init__(self, type, x, y, *group):
+        super().__init__(*group)
+        self.image = load_image(f"Tanks\\Player\\{type}\\top1.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
-class TankType1(Tank):
-    pass
-
-
-class TankType2(Tank):
-    pass
-
-
-class TankType3(Tank):
-    pass
-
-
-class TankType4(Tank):
-    pass
-
-
-class TankType5(Tank):
-    pass
-
-
-class TankType6(Tank):
-    pass
-
-
-class TankType7(Tank):
-    pass
-
-
-class TankType8(Tank):
-    pass
+    def update(self):
+        pass
