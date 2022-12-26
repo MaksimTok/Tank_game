@@ -1,5 +1,5 @@
 import pygame
-
+from settings import *
 
 class Board:
     def __init__(self, width, height):
@@ -46,8 +46,45 @@ class Board:
         self.on_click(self.get_cell(mouse_pos))
 
 
-class Tank:
-    pass
+
+class Tile(pygame.sprite.Sprite):
+    def __init__(self, tile_type, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.image = tile_images[tile_type]
+        if self.image:
+            self.rect = self.image.get_rect().move(
+                tile_width * pos_x, tile_height * pos_y)
+        else:
+
+            self.image = pygame.Surface((tile_width, tile_height))
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+
+
+
+class Tank(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(player_group, all_sprites)
+        self.image = player_image
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.x, self.y = self.rect.x, self.rect.y
+
+    def update(self, *args):
+        if args and args[0].type == pygame.KEYDOWN:
+            if args[0].unicode.lower() == "w":
+                self.y -= tile_height
+            elif args[0].unicode.lower() == "s":
+                self.y += tile_height
+            elif args[0].unicode.lower() == "a":
+                self.x -= tile_width
+            elif args[0].unicode.lower() == "d":
+                self.x += tile_width
+            if board[self.y // tile_height][self.x // tile_width] != "#":
+                self.rect.x, self.rect.y = self.x, self.y
+            else:
+                self.x, self.y = self.rect.x, self.rect.y
+
 
 
 class TankType1(Tank):

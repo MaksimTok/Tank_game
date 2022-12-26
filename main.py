@@ -1,22 +1,38 @@
+import os
+import sys
 import pygame
-from settings import *
 from classes import *
+from settings import *
 
+
+def generate_level(level):
+    player_x, player_y, x, y = None, None, None, None
+    for y in range(len(level)):
+        for x in range(len(level[y])):
+            if level[y][x] == '.':
+                Tile('empty', x, y)
+            elif level[y][x] == '#':
+                Tile('wall', x, y)
+            elif level[y][x] == '@':
+                Tile('empty', x, y)
+                player_x, player_y = x, y
+
+    return Tank(player_x, player_y), x, y
+
+
+pygame.init()
+screen = pygame.display.set_mode(SIZE)
+pygame.display.set_caption('Танчики')
+clock = pygame.time.Clock()
 
 if __name__ == '__main__':
-    pygame.init()
-    pygame.display.set_caption('Инициализация игры')
-    size = WIDTH, HEIGHT
-    screen = pygame.display.set_mode(size)
-    board = Board(10, 10)
-    board.set_view(100, 100, 50)
-    running = True
-    while running:
+    player, level_x, level_y = generate_level(board)
+    screen.fill((0, 0, 0))
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                board.get_click(event.pos)
-        screen.fill((0, 0, 0))
-        board.render(screen)
+                terminate()
+            all_sprites.update(event)
+        clock.tick(fps)
+        all_sprites.draw(screen)
         pygame.display.flip()
