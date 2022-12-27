@@ -23,16 +23,10 @@ def load_level(filename):
 
 
 
-
 SIZE = WIDTH, HEIGHT = 800, 600
-fps = 30
-tile_images = {
-    'wall': load_image('Blocks/brick.png'),
-    'empty': None
-}
-player_image = load_image('Tanks/Player/Type1/top1.png')
+fps = 5
 board = load_level('maps1.txt')
-tile_width, tile_height = 15, 16
+tile_width, tile_height = 45, 48
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()

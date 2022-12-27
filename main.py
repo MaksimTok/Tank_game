@@ -10,14 +10,14 @@ def generate_level(level):
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
-                Tile('empty', x, y)
+                Empty('empty', x, y)
             elif level[y][x] == '#':
-                Tile('wall', x, y)
+                Brick('wall', x, y)
             elif level[y][x] == '@':
-                Tile('empty', x, y)
+                Empty('empty', x, y)
                 player_x, player_y = x, y
 
-    return Tank(player_x, player_y), x, y
+    return Tank(player_x, player_y,1), x, y
 
 
 pygame.init()
@@ -33,6 +33,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 terminate()
             all_sprites.update(event)
+        all_sprites.update()
         clock.tick(fps)
         all_sprites.draw(screen)
         pygame.display.flip()

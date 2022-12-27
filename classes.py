@@ -1,5 +1,7 @@
 import pygame
+
 from settings import *
+
 
 class Board:
     def __init__(self, width, height):
@@ -46,31 +48,38 @@ class Board:
         self.on_click(self.get_cell(mouse_pos))
 
 
+class Brick(pygame.sprite.Sprite):
+    image = load_image('Blocks/brick0.1.png')
 
-class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
-        self.image = tile_images[tile_type]
-        if self.image:
-            self.rect = self.image.get_rect().move(
-                tile_width * pos_x, tile_height * pos_y)
-        else:
+        self.image = Brick.image
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
-            self.image = pygame.Surface((tile_width, tile_height))
-        self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
-
+class Empty(pygame.sprite.Sprite):
+    def __init__(self, tile_type, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.image = pygame.Surface((tile_width, tile_height))
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
 
 class Tank(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y):
+
+    def __init__(self, pos_x, pos_y, type):
         super().__init__(player_group, all_sprites)
-        self.image = player_image
+        self.player_image = [load_image(f'Tanks/Player/Type{type}/top10.1.png'),
+                        load_image(f'Tanks/Player/Type{type}/top20.1.png')]
+        self.count = 0
+        self.image = self.player_image[self.count]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.x, self.y = self.rect.x, self.rect.y
 
     def update(self, *args):
+        self.count = (self.count + 1) % len(self.player_image)
+        self.image = self.player_image[self.count]
+        self.rect = self.image.get_rect().move(self.x, self.y)
+        self.x, self.y = self.rect.x, self.rect.y
         if args and args[0].type == pygame.KEYDOWN:
             if args[0].unicode.lower() == "w":
                 self.y -= tile_height
@@ -84,8 +93,7 @@ class Tank(pygame.sprite.Sprite):
                 self.rect.x, self.rect.y = self.x, self.y
             else:
                 self.x, self.y = self.rect.x, self.rect.y
-
-
+            self.rect = self.image.get_rect().move(self.x, self.y)
 
 class TankType1(Tank):
     pass
