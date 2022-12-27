@@ -1,4 +1,4 @@
-import pygame
+import pygame.sprite
 
 from settings import *
 
@@ -47,18 +47,37 @@ class Board:
     def get_click(self, mouse_pos):
         self.on_click(self.get_cell(mouse_pos))
 
+class Leafs(pygame.sprite.Sprite):
+    image = load_image('Blocks/leafs0.1.png')
+
+    def __init__(self, pos_x, pos_y):
+        super().__init__(all_sprites)
+        self.image = Leafs.image
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+
 
 class Brick(pygame.sprite.Sprite):
     image = load_image('Blocks/brick0.1.png')
+
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.image = Brick.image
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
         self.hp = 100
 
-class Empty(pygame.sprite.Sprite):
+
+class Unbreak(pygame.sprite.Sprite):
+    image = load_image('Blocks/unbreak0.1.png')
+
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
+        self.image = Unbreak.image
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+
+
+class Empty(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(all_sprites)
         self.image = pygame.Surface((tile_width, tile_height))
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
@@ -80,7 +99,8 @@ class Tank(pygame.sprite.Sprite):
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
-        self.x, self.y = tile_width * pos_x, tile_height * pos_y
+        self.hp = 100
+        self.x, self.y = self.rect.x, self.rect.y
 
     def draw(self):
         self.count = (self.count + 1) % len(self.player_image[self.player_vel])
@@ -90,18 +110,22 @@ class Tank(pygame.sprite.Sprite):
     def update(self, *args):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            self.x -= tile_width
+            self.rect.x -= tile_width // 3
             self.player_vel = "left"
         elif keys[pygame.K_RIGHT]:
-            self.x += tile_width
+            self.rect.x += tile_width // 3
             self.player_vel = "right"
         elif keys[pygame.K_UP]:
-            self.y -= tile_height
+            self.rect.y -= tile_height // 3
             self.player_vel = "top"
         elif keys[pygame.K_DOWN]:
-            self.y += tile_height
+            self.rect.y += tile_height // 3
             self.player_vel = "down"
-        if board[self.y // tile_height][self.x // tile_width] == "#":
+        if keys[pygame.K_SPACE]:
+            print("fire")
+        if pygame.sprite.spritecollideany(self, tiles_group):
+            self.rect.x, self.rect.y = self.x, self.y
+        else:
             self.x, self.y = self.rect.x, self.rect.y
         self.draw()
 
@@ -144,4 +168,3 @@ class TankType7(Tank):
 class TankType8(Tank):
     def __init__(self, pos_x, pos_y):
         super().__init__(pos_x, pos_y, 8)
-
