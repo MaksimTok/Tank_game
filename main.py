@@ -1,5 +1,3 @@
-import os
-import sys
 import pygame
 from classes import *
 from settings import *
@@ -10,14 +8,14 @@ def generate_level(level):
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
-                Empty('empty', x, y)
+                Empty(x, y)
             elif level[y][x] == '#':
-                Brick('wall', x, y)
+                Brick(x, y)
             elif level[y][x] == '@':
-                Empty('empty', x, y)
+                Empty(x, y)
                 player_x, player_y = x, y
 
-    return Tank(player_x, player_y,1), x, y
+    return TankType3(player_x, player_y), x, y
 
 
 pygame.init()
@@ -32,7 +30,6 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            all_sprites.update(event)
         all_sprites.update()
         clock.tick(fps)
         all_sprites.draw(screen)

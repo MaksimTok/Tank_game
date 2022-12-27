@@ -50,78 +50,98 @@ class Board:
 
 class Brick(pygame.sprite.Sprite):
     image = load_image('Blocks/brick0.1.png')
-
-    def __init__(self, tile_type, pos_x, pos_y):
+    def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.image = Brick.image
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+        self.hp = 100
 
 class Empty(pygame.sprite.Sprite):
-    def __init__(self, tile_type, pos_x, pos_y):
+    def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.image = pygame.Surface((tile_width, tile_height))
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
 
 class Tank(pygame.sprite.Sprite):
-
-    def __init__(self, pos_x, pos_y, type):
+    def __init__(self, pos_x, pos_y, tank_type):
         super().__init__(player_group, all_sprites)
-        self.player_image = [load_image(f'Tanks/Player/Type{type}/top10.1.png'),
-                        load_image(f'Tanks/Player/Type{type}/top20.1.png')]
+        self.tank_type = tank_type
+        self.player_vel = "top"
+        self.player_image = {"top": [load_image(f'Tanks/Player/Type{self.tank_type}/top10.1.png'),
+                                     load_image(f'Tanks/Player/Type{self.tank_type}/top20.1.png')],
+                             "down": [load_image(f'Tanks/Player/Type{self.tank_type}/down10.1.png'),
+                                      load_image(f'Tanks/Player/Type{self.tank_type}/down20.1.png')],
+                             "left": [load_image(f'Tanks/Player/Type{self.tank_type}/left10.1.png'),
+                                      load_image(f'Tanks/Player/Type{self.tank_type}/left20.1.png')],
+                             "right": [load_image(f'Tanks/Player/Type{self.tank_type}/right10.1.png'),
+                                       load_image(f'Tanks/Player/Type{self.tank_type}/right20.1.png')]}
         self.count = 0
-        self.image = self.player_image[self.count]
+        self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
-        self.x, self.y = self.rect.x, self.rect.y
+        self.x, self.y = tile_width * pos_x, tile_height * pos_y
+
+    def draw(self):
+        self.count = (self.count + 1) % len(self.player_image[self.player_vel])
+        self.image = self.player_image[self.player_vel][self.count]
+        self.rect = self.image.get_rect().move(self.x, self.y)
 
     def update(self, *args):
-        self.count = (self.count + 1) % len(self.player_image)
-        self.image = self.player_image[self.count]
-        self.rect = self.image.get_rect().move(self.x, self.y)
-        self.x, self.y = self.rect.x, self.rect.y
-        if args and args[0].type == pygame.KEYDOWN:
-            if args[0].unicode.lower() == "w":
-                self.y -= tile_height
-            elif args[0].unicode.lower() == "s":
-                self.y += tile_height
-            elif args[0].unicode.lower() == "a":
-                self.x -= tile_width
-            elif args[0].unicode.lower() == "d":
-                self.x += tile_width
-            if board[self.y // tile_height][self.x // tile_width] != "#":
-                self.rect.x, self.rect.y = self.x, self.y
-            else:
-                self.x, self.y = self.rect.x, self.rect.y
-            self.rect = self.image.get_rect().move(self.x, self.y)
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.x -= tile_width
+            self.player_vel = "left"
+        elif keys[pygame.K_RIGHT]:
+            self.x += tile_width
+            self.player_vel = "right"
+        elif keys[pygame.K_UP]:
+            self.y -= tile_height
+            self.player_vel = "top"
+        elif keys[pygame.K_DOWN]:
+            self.y += tile_height
+            self.player_vel = "down"
+        if board[self.y // tile_height][self.x // tile_width] == "#":
+            self.x, self.y = self.rect.x, self.rect.y
+        self.draw()
+
 
 class TankType1(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 1)
 
 
 class TankType2(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 2)
 
 
 class TankType3(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 3)
 
 
 class TankType4(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 4)
 
 
 class TankType5(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 5)
 
 
 class TankType6(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 6)
 
 
 class TankType7(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 7)
 
 
 class TankType8(Tank):
-    pass
+    def __init__(self, pos_x, pos_y):
+        super().__init__(pos_x, pos_y, 8)
+
