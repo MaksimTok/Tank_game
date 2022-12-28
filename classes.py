@@ -75,13 +75,6 @@ class Unbreak(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
 
-class Empty(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(all_sprites)
-        self.image = pygame.Surface((tile_width, tile_height))
-        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
-
-
 class Tank(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, tank_type):
         super().__init__(player_group, all_sprites)
