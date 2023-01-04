@@ -48,7 +48,7 @@ class Board:
         self.on_click(self.get_cell(mouse_pos))
 
 class Leafs(pygame.sprite.Sprite):
-    image = load_image('Blocks/leafs0.1.png')
+    image = load_image('Blocks/leafs.png')
 
     def __init__(self, pos_x, pos_y):
         super().__init__(all_sprites)
@@ -57,7 +57,7 @@ class Leafs(pygame.sprite.Sprite):
 
 
 class Brick(pygame.sprite.Sprite):
-    image = load_image('Blocks/brick0.1.png')
+    image = load_image('Blocks/brick.png')
 
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
@@ -67,7 +67,7 @@ class Brick(pygame.sprite.Sprite):
 
 
 class Unbreak(pygame.sprite.Sprite):
-    image = load_image('Blocks/unbreak0.1.png')
+    image = load_image('Blocks/unbreak.png')
 
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
@@ -80,14 +80,14 @@ class Tank(pygame.sprite.Sprite):
         super().__init__(player_group, all_sprites)
         self.tank_type = tank_type
         self.player_vel = "top"
-        self.player_image = {"top": [load_image(f'Tanks/Player/Type{self.tank_type}/top10.1.png'),
-                                     load_image(f'Tanks/Player/Type{self.tank_type}/top20.1.png')],
-                             "down": [load_image(f'Tanks/Player/Type{self.tank_type}/down10.1.png'),
-                                      load_image(f'Tanks/Player/Type{self.tank_type}/down20.1.png')],
-                             "left": [load_image(f'Tanks/Player/Type{self.tank_type}/left10.1.png'),
-                                      load_image(f'Tanks/Player/Type{self.tank_type}/left20.1.png')],
-                             "right": [load_image(f'Tanks/Player/Type{self.tank_type}/right10.1.png'),
-                                       load_image(f'Tanks/Player/Type{self.tank_type}/right20.1.png')]}
+        self.player_image = {"top": [load_image(f'Tanks/Player/Type{self.tank_type}/top1.png'),
+                                     load_image(f'Tanks/Player/Type{self.tank_type}/top2.png')],
+                             "down": [load_image(f'Tanks/Player/Type{self.tank_type}/down1.png'),
+                                      load_image(f'Tanks/Player/Type{self.tank_type}/down2.png')],
+                             "left": [load_image(f'Tanks/Player/Type{self.tank_type}/left1.png'),
+                                      load_image(f'Tanks/Player/Type{self.tank_type}/left2.png')],
+                             "right": [load_image(f'Tanks/Player/Type{self.tank_type}/right1.png'),
+                                       load_image(f'Tanks/Player/Type{self.tank_type}/right2.png')]}
         self.count = 0
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
