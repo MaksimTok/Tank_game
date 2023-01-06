@@ -47,6 +47,7 @@ class Board:
     def get_click(self, mouse_pos):
         self.on_click(self.get_cell(mouse_pos))
 
+
 class Leafs(pygame.sprite.Sprite):
     image = load_image('Blocks/leafs.png')
 
@@ -60,17 +61,21 @@ class Brick(pygame.sprite.Sprite):
     image = load_image('Blocks/brick.png')
 
     def __init__(self, pos_x, pos_y):
-        super().__init__(tiles_group, all_sprites)
+        super().__init__(tiles_group, brick_group, all_sprites)
         self.image = Brick.image
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
         self.hp = 100
+
+    def update(self, *args):
+        if self.hp <= 0:
+            self.kill()
 
 
 class Unbreak(pygame.sprite.Sprite):
     image = load_image('Blocks/unbreak.png')
 
     def __init__(self, pos_x, pos_y):
-        super().__init__(tiles_group, all_sprites)
+        super().__init__(tiles_group, unbreak_group, all_sprites)
         self.image = Unbreak.image
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
@@ -92,6 +97,7 @@ class Tank(pygame.sprite.Sprite):
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
+        self.kd = 0
         self.hp = 100
         self.x, self.y = self.rect.x, self.rect.y
 
@@ -114,50 +120,41 @@ class Tank(pygame.sprite.Sprite):
         elif keys[pygame.K_DOWN]:
             self.rect.y += tile_height // 3
             self.player_vel = "down"
-        if keys[pygame.K_SPACE]:
-            print("fire")
+        if keys[pygame.K_SPACE] and self.kd <= 0:
+            if self.player_vel == "down":
+                vx, vy = 0, 1
+            elif self.player_vel == "top":
+                vx, vy = 0, -1
+            elif self.player_vel == "left":
+                vx, vy = -1, 0
+            elif self.player_vel == "right":
+                vx, vy = 1, 0
+            Bullet(self.x + tile_width // 2, self.y + tile_height // 2, vx, vy)
+            self.kd = 2 * fps
         if pygame.sprite.spritecollideany(self, tiles_group):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
         self.draw()
+        self.kd -= 1
 
 
-class TankType1(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 1)
+class Bullet(pygame.sprite.Sprite):
 
+    def __init__(self, pos_x, pos_y, vel_x, vel_y):
+        super().__init__(bullet_group, all_sprites)
+        self.image = pygame.Surface((4, 4))
+        pygame.draw.circle(self.image, pygame.Color("white"), (2, 2), 2)
+        self.vx, self.vy = vel_x, vel_y
+        self.rect = self.image.get_rect().move(pos_x + (tile_width // 2 * vel_x), pos_y + (tile_height // 2 * vel_y))
 
-class TankType2(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 2)
+    def update(self, *args):
+        self.rect.x += self.vx * 10
+        self.rect.y += self.vy * 10
+        if player := pygame.sprite.spritecollideany(self, player_group):
+            player.hp -= 5
+        elif brick := pygame.sprite.spritecollideany(self, brick_group):
+            brick.hp -= 35
 
-
-class TankType3(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 3)
-
-
-class TankType4(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 4)
-
-
-class TankType5(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 5)
-
-
-class TankType6(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 6)
-
-
-class TankType7(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 7)
-
-
-class TankType8(Tank):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(pos_x, pos_y, 8)
+        if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, player_group):
+            self.kill()

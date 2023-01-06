@@ -14,11 +14,11 @@ def generate_level(level):
                 unbreak.append((x, y))
             elif level[y][x] == 'L':
                 leafs.append((x, y))
-            elif level[y][x] == '@':
-                player_x, player_y = x, y
+            elif level[y][x].isdigit():
+                player_x, player_y, type = x, y, int(level[y][x])
     [Brick(x, y) for x, y in brick]
     [Unbreak(x, y) for x, y in unbreak]
-    player = TankType3(player_x, player_y)
+    player = Tank(player_x, player_y, type)
     [Leafs(x, y) for x, y in leafs]
     return player, x, y
 
