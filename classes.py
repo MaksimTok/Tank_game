@@ -1,6 +1,7 @@
 import pygame.sprite
-
+from typing import Callable
 from settings import *
+from inspect import isfunction
 
 
 class Board:
@@ -133,7 +134,7 @@ class Tank(pygame.sprite.Sprite):
                 vx, vy = -1, 0
             elif self.player_vel == "right":
                 vx, vy = 1, 0
-            self.bullet = Bullet(self.x + tile_width // 2, self.y + tile_height // 2, vx, vy, self.damage)
+            self.bullet = Bullet(self, self.x + tile_width // 2, self.y + tile_height // 2, vx, vy, self.damage)
         elif self.bullet and not self.bullet.live:
             self.bullet = None
         if pygame.sprite.spritecollideany(self, tiles_group):
@@ -146,8 +147,9 @@ class Tank(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     live = True
 
-    def __init__(self, pos_x, pos_y, vel_x, vel_y, damage):
+    def __init__(self, parent, pos_x, pos_y, vel_x, vel_y, damage):
         super().__init__(bullet_group, all_sprites)
+        self.parent = parent
         self.image = pygame.Surface((4, 4))
         pygame.draw.circle(self.image, pygame.Color("white"), (2, 2), 2)
         self.damage = damage
@@ -155,13 +157,31 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(pos_x + (tile_width // 2 * vel_x), pos_y + (tile_height // 2 * vel_y))
 
     def update(self, *args):
-        self.rect.x += self.vx * 10
-        self.rect.y += self.vy * 10
-        if player := pygame.sprite.spritecollideany(self, player_group):
+        self.rect.x += self.vx * 30
+        self.rect.y += self.vy * 30
+        if (player := pygame.sprite.spritecollideany(self, player_group)) and player != self.parent:
             player.hp -= self.damage
         elif brick := pygame.sprite.spritecollideany(self, brick_group):
             brick.hp -= self.damage
-
-        if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, player_group):
+        if pygame.sprite.spritecollideany(self, tiles_group) or\
+                (pygame.sprite.spritecollideany(self, player_group) and
+                 pygame.sprite.spritecollideany(self, player_group) != self.parent):
             self.kill()
             self.live = False
+
+class Button(pygame.sprite.Sprite):
+
+    def __init__(self, text, color, pos_x, pos_y, size=30):
+        super().__init__(button_group)
+        self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
+        self.text = self.font.render(text, 1, color)
+        self.rect = self.text.get_rect().move(pos_x, pos_y)
+        self.event = None
+        screen.blit(self.text, self.rect)
+
+    def onclick(self, func):
+        self.event = func
+
+    def update(self, *args):
+        if pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pygame.mouse.get_pos()) and isfunction(self.event):
+            self.event()

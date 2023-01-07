@@ -24,11 +24,13 @@ def generate_level(level):
 
 
 pygame.init()
-screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Танчики')
 clock = pygame.time.Clock()
 
-if __name__ == '__main__':
+def game():
+    screen.fill((0, 0, 0))
+    button_group.empty()
+
     player, level_x, level_y = generate_level(board)
     screen.fill((0, 0, 0))
     while True:
@@ -40,3 +42,6 @@ if __name__ == '__main__':
         clock.tick(fps)
         all_sprites.draw(screen)
         pygame.display.flip()
+
+if __name__ == '__main__':
+    game()

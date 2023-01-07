@@ -1,5 +1,6 @@
 import os
 import sys
+
 import pygame
 
 
@@ -26,7 +27,7 @@ def load_level(filename):
 
 
 SIZE = WIDTH, HEIGHT = 675, 720
-fps = 30
+fps = 24
 board = load_level('maps1.txt')
 tile_width, tile_height = 45, 48
 all_sprites = pygame.sprite.Group()
@@ -35,6 +36,8 @@ unbreak_group = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+button_group = pygame.sprite.Group()
+screen = pygame.display.set_mode(SIZE)
 blocks = ["#", "$", "W"]
 
 #              [hp, damage, wspeed, hspeed]
