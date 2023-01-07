@@ -98,29 +98,33 @@ class Tank(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.kd = 0
-        self.hp = 100
         self.x, self.y = self.rect.x, self.rect.y
+        self.bullet = None
+        self.hp, self.damage, self.wspeed, self.hspeed = tank_settings[tank_type]
 
     def draw(self):
-        self.count = (self.count + 1) % len(self.player_image[self.player_vel])
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(self.x, self.y)
 
     def update(self, *args):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            self.rect.x -= tile_width // 3
+            self.rect.x -= self.wspeed
             self.player_vel = "left"
+            self.count = (self.count + 1) % 2
         elif keys[pygame.K_RIGHT]:
-            self.rect.x += tile_width // 3
+            self.rect.x += self.wspeed
             self.player_vel = "right"
+            self.count = (self.count + 1) % 2
         elif keys[pygame.K_UP]:
-            self.rect.y -= tile_height // 3
+            self.rect.y -= self.hspeed
             self.player_vel = "top"
+            self.count = (self.count + 1) % 2
         elif keys[pygame.K_DOWN]:
-            self.rect.y += tile_height // 3
+            self.rect.y += self.hspeed
             self.player_vel = "down"
-        if keys[pygame.K_SPACE] and self.kd <= 0:
+            self.count = (self.count + 1) % 2
+        if keys[pygame.K_SPACE] and self.bullet is None:
             if self.player_vel == "down":
                 vx, vy = 0, 1
             elif self.player_vel == "top":
@@ -129,22 +133,24 @@ class Tank(pygame.sprite.Sprite):
                 vx, vy = -1, 0
             elif self.player_vel == "right":
                 vx, vy = 1, 0
-            Bullet(self.x + tile_width // 2, self.y + tile_height // 2, vx, vy)
-            self.kd = 2 * fps
+            self.bullet = Bullet(self.x + tile_width // 2, self.y + tile_height // 2, vx, vy, self.damage)
+        elif self.bullet and not self.bullet.live:
+            self.bullet = None
         if pygame.sprite.spritecollideany(self, tiles_group):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
         self.draw()
-        self.kd -= 1
 
 
 class Bullet(pygame.sprite.Sprite):
+    live = True
 
-    def __init__(self, pos_x, pos_y, vel_x, vel_y):
+    def __init__(self, pos_x, pos_y, vel_x, vel_y, damage):
         super().__init__(bullet_group, all_sprites)
         self.image = pygame.Surface((4, 4))
         pygame.draw.circle(self.image, pygame.Color("white"), (2, 2), 2)
+        self.damage = damage
         self.vx, self.vy = vel_x, vel_y
         self.rect = self.image.get_rect().move(pos_x + (tile_width // 2 * vel_x), pos_y + (tile_height // 2 * vel_y))
 
@@ -152,9 +158,10 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x += self.vx * 10
         self.rect.y += self.vy * 10
         if player := pygame.sprite.spritecollideany(self, player_group):
-            player.hp -= 5
+            player.hp -= self.damage
         elif brick := pygame.sprite.spritecollideany(self, brick_group):
-            brick.hp -= 35
+            brick.hp -= self.damage
 
         if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, player_group):
             self.kill()
+            self.live = False

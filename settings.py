@@ -2,9 +2,11 @@ import os
 import sys
 import pygame
 
+
 def terminate():
     pygame.quit()
     sys.exit()
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('Sprites', name)
@@ -14,6 +16,7 @@ def load_image(name, colorkey=None):
     image = pygame.image.load(fullname)
     return image
 
+
 def load_level(filename):
     filename = "maps/" + filename
     with open(filename, 'r') as mapFile:
@@ -22,9 +25,8 @@ def load_level(filename):
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 
-
 SIZE = WIDTH, HEIGHT = 675, 720
-fps = 20
+fps = 30
 board = load_level('maps1.txt')
 tile_width, tile_height = 45, 48
 all_sprites = pygame.sprite.Group()
@@ -34,3 +36,13 @@ tiles_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 blocks = ["#", "$", "W"]
+
+#              [hp, damage, wspeed, hspeed]
+tank_settings = {1: [30, 35, 9, 12],  # из-за разницы между шириной и высотой клетки пришлось делать две скорости
+                 2: [60, 35, 9, 12],  # вертикальную и горизонтальную и так во всех типах
+                 3: [60, 50, 9, 12],
+                 4: [100, 35, 9, 12],
+                 5: [60, 35, 15, 16],
+                 6: [30, 35, 15, 16],
+                 7: [60, 50, 15, 16],
+                 8: [110, 50, 9, 12]}
