@@ -28,6 +28,7 @@ def load_level(filename):
 
 SIZE = WIDTH, HEIGHT = 675, 720
 fps = 24
+type = 1
 board = load_level('maps1.txt')
 tile_width, tile_height = 45, 48
 all_sprites = pygame.sprite.Group()

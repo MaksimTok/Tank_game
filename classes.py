@@ -173,6 +173,7 @@ class Button(pygame.sprite.Sprite):
 
     def __init__(self, text, color, pos_x, pos_y, size=30):
         super().__init__(button_group)
+        self.name = text
         self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
         self.text = self.font.render(text, 1, color)
         self.rect = self.text.get_rect().move(pos_x, pos_y)
@@ -184,4 +185,4 @@ class Button(pygame.sprite.Sprite):
 
     def update(self, *args):
         if pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pygame.mouse.get_pos()) and isfunction(self.event):
-            self.event()
+            self.event(self)

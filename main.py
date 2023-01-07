@@ -1,6 +1,6 @@
 import pygame
 from classes import *
-from settings import *
+import settings
 
 
 def generate_level(level):
@@ -14,11 +14,11 @@ def generate_level(level):
                 unbreak.append((x, y))
             elif level[y][x] == 'L':
                 leafs.append((x, y))
-            elif level[y][x].isdigit():
-                player_x, player_y, type = x, y, int(level[y][x])
+            elif level[y][x] == "@":
+                player_x, player_y = x, y
     [Brick(x, y) for x, y in brick]
     [Unbreak(x, y) for x, y in unbreak]
-    player = Tank(player_x, player_y, type)
+    player = Tank(player_x, player_y, settings.type)
     [Leafs(x, y) for x, y in leafs]
     return player, x, y
 
@@ -27,12 +27,10 @@ pygame.init()
 pygame.display.set_caption('Танчики')
 clock = pygame.time.Clock()
 
-def game():
+def game(*args):
     screen.fill((0, 0, 0))
     button_group.empty()
-
     player, level_x, level_y = generate_level(board)
-    screen.fill((0, 0, 0))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
