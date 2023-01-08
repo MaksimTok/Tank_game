@@ -9,7 +9,7 @@ def terminate():
     sys.exit()
 
 
-def load_image(name, colorkey=None):
+def load_image(name):
     fullname = os.path.join('Sprites', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
@@ -28,8 +28,10 @@ def load_level(filename):
 
 SIZE = WIDTH, HEIGHT = 675, 720
 fps = 24
-type = 1
-board = load_level('maps1.txt')
+tank_type = 1
+maps = ['maps1.txt', 'maps2.txt', 'maps3.txt', 'maps4.txt']
+map_id = 1
+pause = False
 tile_width, tile_height = 45, 48
 all_sprites = pygame.sprite.Group()
 brick_group = pygame.sprite.Group()
