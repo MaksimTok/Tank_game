@@ -5,7 +5,7 @@ import settings
 
 def generate_level(level):
     player_x, player_y, x, y = None, None, None, None
-    brick, leafs, unbreak, empty = [], [], [], []
+    brick, leafs, unbreak, base, empty = [], [], [], [], []
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '#':
@@ -16,7 +16,10 @@ def generate_level(level):
                 leafs.append((x, y))
             elif level[y][x] == "@":
                 player_x, player_y = x, y
+            elif level[y][x] == "B":
+                base.append((x, y))
     [Brick(x, y) for x, y in brick]
+    [Base(x, y) for x, y in base]
     [Unbreak(x, y) for x, y in unbreak]
     player = Tank(player_x, player_y, settings.tank_type)
     [Leafs(x, y) for x, y in leafs]

@@ -2,7 +2,7 @@ from os import listdir
 from os.path import isfile, join
 from PIL import Image
 
-onlyfiles = [f for f in listdir() if isfile(join(f)) and f.endswith(".jpeg")]
+onlyfiles = [f for f in listdir() if isfile(join(f)) and f.endswith(".png")]
 for el in onlyfiles:
     img = Image.open(el)
     pixels = img.load()

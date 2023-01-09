@@ -52,7 +52,6 @@ class Tank(pygame.sprite.Sprite):
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
-        self.kd = 0
         self.x, self.y = self.rect.x, self.rect.y
         self.bullet = None
         self.hp, self.damage, self.wspeed, self.hspeed = tank_settings[tank_type]
@@ -104,24 +103,33 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, parent, pos_x, pos_y, vel_x, vel_y, damage):
         super().__init__(bullet_group, all_sprites)
         self.parent = parent
-        self.image = pygame.Surface((4, 4))
-        pygame.draw.circle(self.image, pygame.Color("white"), (2, 2), 2)
+        if vel_x == 0 and vel_y == 1:
+            self.image = load_image('Tanks/Bullet/bullet_down.png')
+        elif vel_x == 0 and vel_y == -1:
+            self.image = load_image('Tanks/Bullet/bullet_top.png')
+        elif vel_x == -1 and vel_y == 0:
+            self.image = load_image('Tanks/Bullet/bullet_left.png')
+        elif vel_x == 1 and vel_y == 0:
+            self.image = load_image('Tanks/Bullet/bullet_right.png')
         self.damage = damage
         self.vx, self.vy = vel_x, vel_y
         self.rect = self.image.get_rect().move(pos_x + (tile_width // 2 * vel_x), pos_y + (tile_height // 2 * vel_y))
 
     def update(self, *args):
-        self.rect.x += self.vx * 30
-        self.rect.y += self.vy * 30
+        self.rect.x += self.vx * 20
+        self.rect.y += self.vy * 20
         if (player := pygame.sprite.spritecollideany(self, player_group)) and player != self.parent:
             player.hp -= self.damage
         elif brick := pygame.sprite.spritecollideany(self, brick_group):
             brick.hp -= self.damage
-        if pygame.sprite.spritecollideany(self, tiles_group) or\
+        elif base := pygame.sprite.spritecollideany(self, base_group):
+            base.hp -= self.damage
+        if pygame.sprite.spritecollideany(self, tiles_group) or \
                 (pygame.sprite.spritecollideany(self, player_group) and
                  pygame.sprite.spritecollideany(self, player_group) != self.parent):
             self.kill()
             self.live = False
+
 
 class Button(pygame.sprite.Sprite):
 
@@ -139,3 +147,15 @@ class Button(pygame.sprite.Sprite):
     def update(self, *args):
         if pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pygame.mouse.get_pos()) and isfunction(self.event):
             self.event(self)
+
+
+class Base(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, base_group, all_sprites)
+        self.image = load_image('Blocks/base.png')
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+        self.hp = 100
+
+    def update(self, *args):
+        if self.hp <= 0:
+            self.image = load_image('Blocks/fall_base.png')

@@ -40,8 +40,9 @@ tiles_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 button_group = pygame.sprite.Group()
+base_group = pygame.sprite.Group()
 screen = pygame.display.set_mode(SIZE)
-blocks = ["#", "$", "W"]
+blocks = ["#", "$", "W", "B"]
 
 #              [hp, damage, wspeed, hspeed]
 tank_settings = {1: [30, 35, 9, 12],  # из-за разницы между шириной и высотой клетки пришлось делать две скорости
