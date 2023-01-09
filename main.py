@@ -1,7 +1,6 @@
 import pygame
 from classes import *
 import settings
-from menu import *
 
 
 def generate_level(level):
@@ -29,51 +28,6 @@ pygame.display.set_caption('Танчики')
 clock = pygame.time.Clock()
 
 
-
-def pause():
-
-    def unpause(*args):
-        settings.pause = False
-
-    def in_menu(*args):
-        settings.pause = False
-        menu()
-
-    pause_screen = pygame.Surface(settings.SIZE, pygame.SRCALPHA).convert_alpha()
-    pause_screen.fill((0, 0, 0, 100))
-
-    font = pygame.font.Font("fonts/PixelFont.ttf", 90)
-    string_rendered = font.render("Пауза", True, pygame.Color('orange'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.top = 100
-    intro_rect.x = 20
-    pause_screen.blit(string_rendered, intro_rect)
-
-    return_btn = Button("Вернуться", pygame.Color('orange'), 50, 300)
-    return_btn.onclick(unpause)
-
-    menu_btn = Button("Выйти в главное меню", pygame.Color('orange'), 50, 350)
-    menu_btn.onclick(in_menu)
-
-    button_group.draw(pause_screen)
-
-    screen.blit(pause_screen, pause_screen.get_rect())
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            if event.type == pygame.KEYDOWN and event.key == 27:
-                settings.pause = False
-
-        if not settings.pause:
-            button_group.empty()
-            return
-        button_group.update()
-        pygame.display.flip()
-
-
-
 def game(*args):
     screen.fill((0, 0, 0))
     button_group.empty()
@@ -89,12 +43,13 @@ def game(*args):
             if event.type == pygame.KEYDOWN and event.key == 27:
                 settings.pause = True
         if settings.pause == True:
-                pause()
+            pause()
         screen.fill((0, 0, 0))
         all_sprites.update()
         clock.tick(fps)
         all_sprites.draw(screen)
         pygame.display.flip()
+
 
 if __name__ == '__main__':
     game()
