@@ -87,7 +87,7 @@ class Tank(pygame.sprite.Sprite):
                 vx, vy = -1, 0
             elif self.player_vel == "right":
                 vx, vy = 1, 0
-            self.bullet = Bullet(self, self.x + tile_width // 2, self.y + tile_height // 2, vx, vy, self.damage)
+            self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy, self.damage)
         elif self.bullet and not self.bullet.live:
             self.bullet = None
         if pygame.sprite.spritecollideany(self, tiles_group):
