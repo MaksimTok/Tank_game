@@ -207,15 +207,24 @@ def game(*args):
 
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
+    count = 10  # 10 second
+    pygame.time.set_timer(pygame.USEREVENT, 1000)  # 10 second
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.KEYDOWN and event.key == 27:
                 settings.pause = not settings.pause
+            if event.type == pygame.USEREVENT:
+                count -= 1
+                print(count)
         if settings.pause:
             pause_game()
         if player.hp <= 0 or base.hp <= 0:
+            print('Поражение')
+            menu()
+        if count <= 0:
+            print('Выигрышь')
             menu()
         screen.fill((0, 0, 0))
         all_sprites.update()
