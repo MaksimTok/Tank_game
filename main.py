@@ -2,8 +2,8 @@ import pygame
 from classes import *
 import settings
 
-def pause():
 
+def pause_game():
     def unpause(*args):
         settings.pause = False
 
@@ -167,8 +167,8 @@ def menu(*args):
 
 
 def generate_level(level):
-    player_x, player_y, x, y = None, None, None, None
-    brick, leafs, unbreak, base, empty = [], [], [], [], []
+    player_x, player_y, base_x, base_y, x, y = None, None, None, None, None, None
+    brick, leafs, unbreak, empty = [], [], [], []
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '#':
@@ -180,13 +180,13 @@ def generate_level(level):
             elif level[y][x] == "@":
                 player_x, player_y = x, y
             elif level[y][x] == "B":
-                base.append((x, y))
+                base_x, base_y = x, y
     [Brick(x, y) for x, y in brick]
-    [Base(x, y) for x, y in base]
     [Unbreak(x, y) for x, y in unbreak]
     player = Tank(player_x, player_y, settings.tank_type)
+    base = Base(base_x, base_y)
     [Leafs(x, y) for x, y in leafs]
-    return player, x, y
+    return player, base
 
 
 pygame.init()
@@ -199,17 +199,24 @@ def game(*args):
     button_group.empty()
     tiles_group.empty()
     all_sprites.empty()
+    base_group.empty()
+    brick_group.empty()
+    unbreak_group.empty()
+    player_group.empty()
+    bullet_group.empty()
 
     board = load_level(settings.maps[settings.map_id - 1])
-    player, level_x, level_y = generate_level(board)
+    player, base = generate_level(board)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.KEYDOWN and event.key == 27:
                 settings.pause = not settings.pause
-        if settings.pause == True:
-            pause()
+        if settings.pause:
+            pause_game()
+        if player.hp <= 0 or base.hp <= 0:
+            menu()
         screen.fill((0, 0, 0))
         all_sprites.update()
         clock.tick(fps)

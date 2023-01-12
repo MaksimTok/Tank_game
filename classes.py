@@ -49,6 +49,7 @@ class Tank(pygame.sprite.Sprite):
                              "right": [load_image(f'Tanks/Player/Type{self.tank_type}/right1.png'),
                                        load_image(f'Tanks/Player/Type{self.tank_type}/right2.png')]}
         self.count = 0
+        self.kd = 10
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
@@ -78,7 +79,7 @@ class Tank(pygame.sprite.Sprite):
             self.rect.y += self.hspeed
             self.player_vel = "down"
             self.count = (self.count + 1) % 2
-        if keys[pygame.K_SPACE] and self.bullet is None:
+        if keys[pygame.K_SPACE] and self.bullet is None and self.kd <= 0:
             if self.player_vel == "down":
                 vx, vy = 0, 1
             elif self.player_vel == "top":
@@ -88,12 +89,15 @@ class Tank(pygame.sprite.Sprite):
             elif self.player_vel == "right":
                 vx, vy = 1, 0
             self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy, self.damage)
+            self.kd = 10
         elif self.bullet and not self.bullet.live:
             self.bullet = None
         if pygame.sprite.spritecollideany(self, tiles_group):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
+        if self.kd > 0:
+            self.kd -= 1
         self.draw()
 
 
