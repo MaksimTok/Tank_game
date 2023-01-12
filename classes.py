@@ -1,6 +1,8 @@
-import pygame.sprite
-from settings import *
 from inspect import isfunction
+
+import pygame.sprite
+
+from settings import *
 
 
 class Leafs(pygame.sprite.Sprite):
@@ -49,7 +51,6 @@ class Tank(pygame.sprite.Sprite):
                              "right": [load_image(f'Tanks/Player/Type{self.tank_type}/right1.png'),
                                        load_image(f'Tanks/Player/Type{self.tank_type}/right2.png')]}
         self.count = 0
-        self.kd = 10
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
@@ -79,7 +80,7 @@ class Tank(pygame.sprite.Sprite):
             self.rect.y += self.hspeed
             self.player_vel = "down"
             self.count = (self.count + 1) % 2
-        if keys[pygame.K_SPACE] and self.bullet is None and self.kd <= 0:
+        if keys[pygame.K_SPACE] and self.bullet is None:
             if self.player_vel == "down":
                 vx, vy = 0, 1
             elif self.player_vel == "top":
@@ -89,24 +90,20 @@ class Tank(pygame.sprite.Sprite):
             elif self.player_vel == "right":
                 vx, vy = 1, 0
             self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy, self.damage)
-            self.kd = 10
         elif self.bullet and not self.bullet.live:
             self.bullet = None
         if pygame.sprite.spritecollideany(self, tiles_group):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
-        if self.kd > 0:
-            self.kd -= 1
         self.draw()
 
 
 class Bullet(pygame.sprite.Sprite):
-    live = True
-
     def __init__(self, parent, pos_x, pos_y, vel_x, vel_y, damage):
         super().__init__(bullet_group, all_sprites)
         self.parent = parent
+        self.live = True
         if vel_x == 0 and vel_y == 1:
             self.image = load_image('Tanks/Bullet/bullet_down.png')
         elif vel_x == 0 and vel_y == -1:
@@ -138,7 +135,7 @@ class Bullet(pygame.sprite.Sprite):
 class Button(pygame.sprite.Sprite):
 
     def __init__(self, text, color, pos_x, pos_y, size=30):
-        super().__init__(button_group)
+        super().__init__(ui_group)
         self.name = text
         self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
         self.image = self.font.render(text, True, color)
@@ -151,6 +148,16 @@ class Button(pygame.sprite.Sprite):
     def update(self, *args):
         if pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pygame.mouse.get_pos()) and isfunction(self.event):
             self.event(self)
+
+
+class Label(pygame.sprite.Sprite):
+
+    def __init__(self, text, color, pos_x, pos_y, size=30):
+        super().__init__(ui_group)
+        self.name = text
+        self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
+        self.image = self.font.render(text, True, color)
+        self.rect = self.image.get_rect().move(pos_x, pos_y)
 
 
 class Base(pygame.sprite.Sprite):

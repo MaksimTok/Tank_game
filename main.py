@@ -1,9 +1,63 @@
-import pygame
-from classes import *
 import settings
+from classes import *
 
 
-def pause_game():
+def game_over(state):
+    game_screen = settings.screen.copy()
+
+    def in_menu(*args):
+        settings.game_over = False
+        menu()
+
+    def play_again(*args):
+        settings.game_over = True
+        game()
+
+    game_over = pygame.Surface(settings.SIZE, pygame.SRCALPHA).convert_alpha()
+    game_over.fill((0, 0, 0, 100))
+
+    Label(state, pygame.Color('orange'), 15, 200, 80)
+
+    ui_group.draw(game_over)
+    settings.screen.blit(game_over, game_over.get_rect())
+
+    time_out = False
+    pygame.time.set_timer(pygame.USEREVENT, 3000)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.USEREVENT:
+                time_out = True
+                pygame.time.set_timer(pygame.USEREVENT, 0)
+
+        if time_out:
+            game_over = pygame.Surface(settings.SIZE, pygame.SRCALPHA).convert_alpha()
+            game_over.fill((0, 0, 0, 100))
+
+            ui_group.empty()
+            settings.screen.blit(game_screen, game_screen.get_rect())
+
+            Label(state, pygame.Color('orange'), 20, 100, 70)
+
+            play_again_btn = Button("Заново", pygame.Color('orange'), 50, 300)
+            play_again_btn.onclick(play_again)
+
+            menu_btn = Button("Выйти в главное меню", pygame.Color('orange'), 50, 350)
+            menu_btn.onclick(in_menu)
+
+            ui_group.draw(game_over)
+
+            settings.screen.blit(game_over, game_over.get_rect())
+
+        if not settings.game_over:
+            ui_group.empty()
+            return
+        ui_group.update()
+        pygame.display.flip()
+
+
+def pause():
     def unpause(*args):
         settings.pause = False
 
@@ -14,12 +68,7 @@ def pause_game():
     pause_screen = pygame.Surface(settings.SIZE, pygame.SRCALPHA).convert_alpha()
     pause_screen.fill((0, 0, 0, 100))
 
-    font = pygame.font.Font("fonts/PixelFont.ttf", 90)
-    string_rendered = font.render("Пауза", True, pygame.Color('orange'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.top = 100
-    intro_rect.x = 20
-    pause_screen.blit(string_rendered, intro_rect)
+    Label("Пауза", pygame.Color('orange'), 20, 100, 90)
 
     return_btn = Button("Вернуться", pygame.Color('orange'), 50, 300)
     return_btn.onclick(unpause)
@@ -27,8 +76,7 @@ def pause_game():
     menu_btn = Button("Выйти в главное меню", pygame.Color('orange'), 50, 350)
     menu_btn.onclick(in_menu)
 
-    button_group.draw(pause_screen)
-
+    ui_group.draw(pause_screen)
     screen.blit(pause_screen, pause_screen.get_rect())
 
     while True:
@@ -39,9 +87,9 @@ def pause_game():
                 settings.pause = False
 
         if not settings.pause:
-            button_group.empty()
+            ui_group.empty()
             return
-        button_group.update()
+        ui_group.update()
         pygame.display.flip()
 
 
@@ -51,27 +99,24 @@ def map_type(*args):
         map_type()
 
     screen.fill((0, 0, 0))
-    button_group.empty()
+    ui_group.empty()
+    all_sprites.empty()
 
-    font = pygame.font.Font("fonts/PixelFont.ttf", 65)
-    string_rendered = font.render("Карты", True, pygame.Color('orange'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.top = 10
-    intro_rect.x = 20
-    screen.blit(string_rendered, intro_rect)
-    tank_id = 1
+    Label("Карты", pygame.Color('orange'), 20, 10, 65)
+
+    map_id = 1
     for j in range(2):
         for i in range(0, 2):
-            image = load_image(f'UI/maps/map{tank_id}.png')
+            image = load_image(f'UI/maps/map{map_id}.png')
             rect = image.get_rect().move(i * 300 + 100, 100 + j * 300)
             screen.blit(image, rect)
 
-            if tank_id == settings.map_id:
-                map_type_btn = Button(f"Карта {tank_id}", pygame.Color('green'), i * 300 + 100, 350 + j * 300, 20)
+            if map_id == settings.map_id:
+                map_type_btn = Button(f"Карта {map_id}", pygame.Color('green'), i * 300 + 100, 350 + j * 300, 20)
             else:
-                map_type_btn = Button(f"Карта {tank_id}", pygame.Color('orange'), i * 300 + 100, 350 + j * 300, 20)
+                map_type_btn = Button(f"Карта {map_id}", pygame.Color('orange'), i * 300 + 100, 350 + j * 300, 20)
             map_type_btn.onclick(newtype)
-            tank_id += 1
+            map_id += 1
 
     return_btn = Button("Назад", pygame.Color('orange'), 50, 675)
     return_btn.onclick(menu)
@@ -83,14 +128,11 @@ def tank_type(*args):
         tank_type()
 
     screen.fill((0, 0, 0))
-    button_group.empty()
+    ui_group.empty()
+    all_sprites.empty()
 
-    font = pygame.font.Font("fonts/PixelFont.ttf", 65)
-    string_rendered = font.render("Тип Танков", True, pygame.Color('orange'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.top = 50
-    intro_rect.x = 20
-    screen.blit(string_rendered, intro_rect)
+    Label("Типы Танков", pygame.Color('orange'), 20, 50, 65)
+
     tank_id = 1
     for j in range(4):
         for i in range(1, 3):
@@ -101,21 +143,11 @@ def tank_type(*args):
             tank_info = settings.tank_settings[tank_id]
             specific = ["hp", "damage", "wspeed", "hspeed"]
 
-            font = pygame.font.Font("fonts/PixelFont.ttf", 10)
+            string_rendered = f"{' '.join(f'{specific[i]}: {tank_info[i]};' for i in range(2))}"
+            Label(string_rendered, pygame.Color('orange'), i * 300 - 220, 200 + j * 130, 10)
 
-            string_rendered = font.render(f"{' '.join(f'{specific[i]}: {tank_info[i]};' for i in range(2))}", True,
-                                          pygame.Color('orange'))
-            intro_rect = string_rendered.get_rect()
-            intro_rect.y = 200 + j * 130
-            intro_rect.x = i * 300 - 220
-            screen.blit(string_rendered, intro_rect)
-
-            string_rendered = font.render(f"{' '.join(f'{specific[i]}: {tank_info[i]};' for i in range(2, 4))}", True,
-                                          pygame.Color('orange'))
-            intro_rect = string_rendered.get_rect()
-            intro_rect.y = 220 + j * 130
-            intro_rect.x = i * 300 - 220
-            screen.blit(string_rendered, intro_rect)
+            string_rendered = f"{' '.join(f'{specific[i]}: {tank_info[i]};' for i in range(2, 4))}"
+            Label(string_rendered, pygame.Color('orange'), i * 300 - 220, 220 + j * 130, 10)
 
             if tank_id == settings.tank_type:
                 tank_type_btn = Button(f"Танк {tank_id}", pygame.Color('green'), i * 300 - 220, 240 + j * 130, 20)
@@ -130,14 +162,10 @@ def tank_type(*args):
 
 def menu(*args):
     screen.fill((0, 0, 0))
-    button_group.empty()
+    ui_group.empty()
+    all_sprites.empty()
 
-    font = pygame.font.Font("fonts/PixelFont.ttf", 90)
-    string_rendered = font.render("Танчики", True, pygame.Color('orange'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.top = 100
-    intro_rect.x = 20
-    screen.blit(string_rendered, intro_rect)
+    Label("Танчики", pygame.Color('orange'), 20, 100, 90)
 
     start_btn = Button("Начать", pygame.Color('orange'), 50, 300)
     start_btn.onclick(game)
@@ -149,19 +177,19 @@ def menu(*args):
     rect = image.get_rect().move(500, 340)
     screen.blit(image, rect)
 
-    Button(f"Танк {settings.tank_type}", pygame.Color('gray'), 500, 400, 20)
+    Label(f"Танк {settings.tank_type}", pygame.Color('gray'), 500, 400, 20)
 
     map_type_btn = Button("Выбрать карту", pygame.Color('orange'), 50, 450)
     map_type_btn.onclick(map_type)
 
-    Button(f"Карта {settings.map_id}", pygame.Color('gray'), 500, 460, 20)
+    Label(f"Карта {settings.map_id}", pygame.Color('gray'), 500, 460, 20)
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-        button_group.update()
-        button_group.draw(screen)
+        ui_group.update()
+        ui_group.draw(screen)
         pygame.display.flip()
         clock.tick(fps)
 
@@ -195,8 +223,8 @@ clock = pygame.time.Clock()
 
 
 def game(*args):
-    screen.fill((0, 0, 0))
-    button_group.empty()
+    settings.screen.fill((0, 0, 0))
+    ui_group.empty()
     tiles_group.empty()
     all_sprites.empty()
     base_group.empty()
@@ -207,8 +235,8 @@ def game(*args):
 
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
-    count = 10  # 10 second
-    pygame.time.set_timer(pygame.USEREVENT, 1000)  # 10 second
+    end_game = False
+    pygame.time.set_timer(pygame.USEREVENT, 10000)  # 10 second
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -216,17 +244,17 @@ def game(*args):
             if event.type == pygame.KEYDOWN and event.key == 27:
                 settings.pause = not settings.pause
             if event.type == pygame.USEREVENT:
-                count -= 1
-                print(count)
+                end_game = True
+                pygame.time.set_timer(pygame.USEREVENT, 0)
         if settings.pause:
-            pause_game()
+            pause()
         if player.hp <= 0 or base.hp <= 0:
-            print('Поражение')
-            menu()
-        if count <= 0:
-            print('Выигрышь')
-            menu()
-        screen.fill((0, 0, 0))
+            settings.game_over = True
+            game_over("Вы Проиграли")
+        if end_game:
+            settings.game_over = True
+            game_over("Вы Выиграли")
+        settings.screen.fill((0, 0, 0))
         all_sprites.update()
         clock.tick(fps)
         all_sprites.draw(screen)
