@@ -168,7 +168,7 @@ def menu(*args):
 
 def generate_level(level):
     player_x, player_y, base_x, base_y, x, y = None, None, None, None, None, None
-    brick, leafs, unbreak, empty = [], [], [], []
+    brick, leafs, unbreak, spawn, empty = [], [], [], [], []
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '#':
@@ -181,8 +181,11 @@ def generate_level(level):
                 player_x, player_y = x, y
             elif level[y][x] == "B":
                 base_x, base_y = x, y
+            elif level[y][x] == "S":
+                spawn.append((x, y))
     [Brick(x, y) for x, y in brick]
     [Unbreak(x, y) for x, y in unbreak]
+    [SpawnPoint(x, y) for x, y in spawn]
     player = Tank(player_x, player_y, settings.tank_type)
     base = Base(base_x, base_y)
     [Leafs(x, y) for x, y in leafs]
@@ -204,11 +207,12 @@ def game(*args):
     unbreak_group.empty()
     player_group.empty()
     bullet_group.empty()
+    spawn_group.empty()
 
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
-    count = 10  # 10 second
-    pygame.time.set_timer(pygame.USEREVENT, 1000)  # 10 second
+    count = 90  # 90 second
+    pygame.time.set_timer(pygame.USEREVENT, 1000)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
