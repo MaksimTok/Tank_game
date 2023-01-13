@@ -139,7 +139,7 @@ class Bullet(pygame.sprite.Sprite):
 class Button(pygame.sprite.Sprite):
 
     def __init__(self, text, color, pos_x, pos_y, size=30):
-        super().__init__(button_group)
+        super().__init__(ui_group)
         self.name = text
         self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
         self.image = self.font.render(text, True, color)
@@ -171,6 +171,7 @@ class SpawnPoint(pygame.sprite.Sprite):
         super().__init__(spawn_group, all_sprites)
         self.image = pygame.Surface((45, 48))
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+        pygame.draw.rect(self.image, (30, 30, 30), self.rect, 48)
 
     def update(self, *args):
         all_tanks = player_group.sprites()
@@ -248,3 +249,11 @@ class EnemyTank(pygame.sprite.Sprite):
         self.draw()
 
 
+class Label(pygame.sprite.Sprite):
+
+    def __init__(self, text, color, pos_x, pos_y, size=30):
+        super().__init__(ui_group)
+        self.name = text
+        self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
+        self.image = self.font.render(text, True, color)
+        self.rect = self.image.get_rect().move(pos_x, pos_y)
