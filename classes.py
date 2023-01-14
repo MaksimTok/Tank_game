@@ -1,6 +1,6 @@
 from inspect import isfunction
-import pygame.sprite
 from random import randint
+import pygame.sprite
 from settings import *
 
 
@@ -171,7 +171,6 @@ class SpawnPoint(pygame.sprite.Sprite):
         super().__init__(spawn_group, all_sprites)
         self.image = pygame.Surface((45, 48))
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
-        pygame.draw.rect(self.image, (30, 30, 30), self.rect, 48)
 
     def update(self, *args):
         all_tanks = player_group.sprites()
@@ -185,7 +184,7 @@ class SpawnPoint(pygame.sprite.Sprite):
 
 class EnemyTank(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, tank_type):
-        super().__init__(player_group, all_sprites)
+        super().__init__(enemy_group, all_sprites)
         self.tank_type = tank_type
         self.player_vel = "down"
         self.player_image = {"top": [load_image(f'Tanks/Enemy/Type{self.tank_type}/top1.png'),
@@ -204,48 +203,13 @@ class EnemyTank(pygame.sprite.Sprite):
         self.x, self.y = self.rect.x, self.rect.y
         self.bullet = None
         self.hp, self.damage, self.wspeed, self.hspeed = tank_settings[tank_type]
+        screen.blit(self.image, self.rect)
 
     def draw(self):
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(self.x, self.y)
 
     def update(self, *args):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.rect.x -= self.wspeed
-            self.player_vel = "left"
-            self.count = (self.count + 1) % 2
-        elif keys[pygame.K_RIGHT]:
-            self.rect.x += self.wspeed
-            self.player_vel = "right"
-            self.count = (self.count + 1) % 2
-        elif keys[pygame.K_UP]:
-            self.rect.y -= self.hspeed
-            self.player_vel = "top"
-            self.count = (self.count + 1) % 2
-        elif keys[pygame.K_DOWN]:
-            self.rect.y += self.hspeed
-            self.player_vel = "down"
-            self.count = (self.count + 1) % 2
-        if keys[pygame.K_SPACE] and self.bullet is None and self.kd <= 0:
-            if self.player_vel == "down":
-                vx, vy = 0, 1
-            elif self.player_vel == "top":
-                vx, vy = 0, -1
-            elif self.player_vel == "left":
-                vx, vy = -1, 0
-            elif self.player_vel == "right":
-                vx, vy = 1, 0
-            self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy, self.damage)
-            self.kd = 10
-        elif self.bullet and not self.bullet.live:
-            self.bullet = None
-        if pygame.sprite.spritecollideany(self, tiles_group):
-            self.rect.x, self.rect.y = self.x, self.y
-        else:
-            self.x, self.y = self.rect.x, self.rect.y
-        if self.kd > 0:
-            self.kd -= 1
         self.draw()
 
 
@@ -257,6 +221,7 @@ class Label(pygame.sprite.Sprite):
         self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
         self.image = self.font.render(text, True, color)
         self.rect = self.image.get_rect().move(pos_x, pos_y)
+
 
 class Border(pygame.sprite.Sprite):
     def __init__(self, x1, y1, x2, y2):

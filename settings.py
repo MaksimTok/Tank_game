@@ -51,12 +51,13 @@ player_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 base_group = pygame.sprite.Group()
 spawn_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
 screen = pygame.display.set_mode(SIZE)
 blocks = ["#", "$", "W", "B"]
 
 #              [hp, damage, wspeed, hspeed]
 tank_settings = {1: [30, 35, 9, 12],  # из-за разницы между шириной и высотой клетки пришлось делать две скорости
-                 2: [60, 35, 9, 12],  # вертикальную и горизонтальную и так во всех типах
+                 2: [60, 35, 9, 12],  # вертикальную и горизонтальную
                  3: [60, 50, 9, 12],
                  4: [100, 35, 9, 12],
                  5: [60, 35, 15, 16],

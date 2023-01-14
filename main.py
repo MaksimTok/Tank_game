@@ -214,6 +214,8 @@ def generate_level(level):
                 player_x, player_y = x, y
             elif level[y][x] == "B":
                 base_x, base_y = x, y
+            elif level[y][x] == "S":
+                spawn.append((x, y))
     [Brick(x, y) for x, y in brick]
     [Unbreak(x, y) for x, y in unbreak]
     [SpawnPoint(x, y) for x, y in spawn]
@@ -243,7 +245,7 @@ def game(*args):
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
     end_game = False
-    pygame.time.set_timer(pygame.USEREVENT, 10000)  # 10 second
+    pygame.time.set_timer(pygame.USEREVENT, 100000)  # 100 second
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -263,6 +265,7 @@ def game(*args):
             game_over("Вы Выиграли")
         settings.screen.fill((0, 0, 0))
         all_sprites.update()
+        enemy_group.update()
         clock.tick(fps)
         all_sprites.draw(screen)
         pygame.display.flip()
