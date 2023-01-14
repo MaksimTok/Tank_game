@@ -93,7 +93,7 @@ class Tank(pygame.sprite.Sprite):
             self.kd = 10
         elif self.bullet and not self.bullet.live:
             self.bullet = None
-        if pygame.sprite.spritecollideany(self, tiles_group):
+        if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, borders_group):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
@@ -257,3 +257,13 @@ class Label(pygame.sprite.Sprite):
         self.font = pygame.font.Font("fonts/PixelFont.ttf", size)
         self.image = self.font.render(text, True, color)
         self.rect = self.image.get_rect().move(pos_x, pos_y)
+
+class Border(pygame.sprite.Sprite):
+    def __init__(self, x1, y1, x2, y2):
+        super().__init__(borders_group, all_sprites)
+        if x1 == x2:
+            self.image = pygame.Surface([1, y2 - y1])
+            self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
+        else:
+            self.image = pygame.Surface([x2 - x1, 1])
+            self.rect = pygame.Rect(x1, y1, x2 - x1, 1)

@@ -16,7 +16,7 @@ def game_over(state):
     game_over = pygame.Surface(settings.SIZE, pygame.SRCALPHA).convert_alpha()
     game_over.fill((0, 0, 0, 100))
 
-    Label(state, pygame.Color('orange'), 15, 200, 80)
+    state_text = Label(state, pygame.Color('orange'), 15, 200, 80)
 
     ui_group.draw(game_over)
     settings.screen.blit(game_over, game_over.get_rect())
@@ -35,7 +35,7 @@ def game_over(state):
             game_over = pygame.Surface(settings.SIZE, pygame.SRCALPHA).convert_alpha()
             game_over.fill((0, 0, 0, 100))
 
-            ui_group.empty()
+            state_text.kill()
             settings.screen.blit(game_screen, game_screen.get_rect())
 
             Label(state, pygame.Color('orange'), 20, 100, 70)
@@ -195,6 +195,11 @@ def menu(*args):
 
 
 def generate_level(level):
+    Border(-5, -5, WIDTH, -5)
+    Border(-5, HEIGHT, WIDTH, HEIGHT)
+    Border(-5, -5, -5, HEIGHT)
+    Border(WIDTH, -5, WIDTH, HEIGHT)
+
     player_x, player_y, base_x, base_y, x, y = None, None, None, None, None, None
     brick, leafs, unbreak, spawn, empty = [], [], [], [], []
     for y in range(len(level)):
@@ -225,6 +230,7 @@ clock = pygame.time.Clock()
 
 def game(*args):
     settings.screen.fill((0, 0, 0))
+    borders_group.empty()
     ui_group.empty()
     tiles_group.empty()
     all_sprites.empty()
