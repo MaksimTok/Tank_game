@@ -179,7 +179,7 @@ class SpawnPoint(pygame.sprite.Sprite):
             if tank.rect.colliderect(self.rect):
                 is_free = False
         if is_free and randint(0, 3) == 1:
-            EnemyTank(self.rect[0], self.rect[1], randint(1, 7))
+            EnemyTank(self.rect[0] // tile_width, self.rect[1] // tile_height, randint(1, 7))
 
 
 class EnemyTank(pygame.sprite.Sprite):
@@ -203,14 +203,13 @@ class EnemyTank(pygame.sprite.Sprite):
         self.x, self.y = self.rect.x, self.rect.y
         self.bullet = None
         self.hp, self.damage, self.wspeed, self.hspeed = tank_settings[tank_type]
-        screen.blit(self.image, self.rect)
 
     def draw(self):
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(self.x, self.y)
 
     def update(self, *args):
-        self.draw()
+        pass
 
 
 class Label(pygame.sprite.Sprite):
