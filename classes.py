@@ -1,6 +1,8 @@
 from inspect import isfunction
 from random import randint
+
 import pygame.sprite
+
 from settings import *
 
 
@@ -93,7 +95,8 @@ class Tank(pygame.sprite.Sprite):
             self.kd = 10
         elif self.bullet and not self.bullet.live:
             self.bullet = None
-        if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, borders_group):
+        if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, borders_group) or \
+                pygame.sprite.spritecollideany(self, enemy_group):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
@@ -125,13 +128,22 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y += self.vy * 20
         if (player := pygame.sprite.spritecollideany(self, player_group)) and player != self.parent:
             player.hp -= self.damage
+            self.kill()
+            self.live = False
+        if (enemy := pygame.sprite.spritecollideany(self, enemy_group)) and enemy != self.parent:
+            enemy.hp -= self.damage
+            enemy.is_alive = False
+            self.kill()
+            self.live = False
         elif brick := pygame.sprite.spritecollideany(self, brick_group):
             brick.hp -= self.damage
+            self.kill()
+            self.live = False
         elif base := pygame.sprite.spritecollideany(self, base_group):
             base.hp -= self.damage
-        if pygame.sprite.spritecollideany(self, tiles_group) or \
-                (pygame.sprite.spritecollideany(self, player_group) and
-                 pygame.sprite.spritecollideany(self, player_group) != self.parent):
+            self.kill()
+            self.live = False
+        elif self.rect.x < 0 or self.rect.x > WIDTH or self.rect.y < 0 or self.rect.y > HEIGHT:
             self.kill()
             self.live = False
 
@@ -173,13 +185,13 @@ class SpawnPoint(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
     def update(self, *args):
-        all_tanks = player_group.sprites()
+        all_tanks = player_group.sprites() + enemy_group.sprites()
         is_free = True
         for tank in all_tanks:
             if tank.rect.colliderect(self.rect):
                 is_free = False
-        if is_free and randint(0, 3) == 1:
-            EnemyTank(self.rect[0] // tile_width, self.rect[1] // tile_height, randint(1, 7))
+        if is_free and randint(0, 50) == 1:
+            enemys.append(EnemyTank(self.rect[0] // tile_width, self.rect[1] // tile_height, randint(1, 7)))
 
 
 class EnemyTank(pygame.sprite.Sprite):
@@ -196,6 +208,7 @@ class EnemyTank(pygame.sprite.Sprite):
                              "right": [load_image(f'Tanks/Enemy/Type{self.tank_type}/right1.png'),
                                        load_image(f'Tanks/Enemy/Type{self.tank_type}/right2.png')]}
         self.count = 0
+        self.is_alive = True
         self.kd = 10
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
@@ -208,8 +221,51 @@ class EnemyTank(pygame.sprite.Sprite):
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(self.x, self.y)
 
-    def update(self, *args):
+    def update(self, input_data):
+        if self.hp <= 0:
+            self.kill()
+            enemys.remove(self)
+        if input_data == 0:
+            self.rect.x -= self.wspeed
+            self.player_vel = "left"
+            self.count = (self.count + 1) % 2
+        elif input_data == 1:
+            self.rect.x += self.wspeed
+            self.player_vel = "right"
+            self.count = (self.count + 1) % 2
+        elif input_data == 2:
+            self.rect.y -= self.hspeed
+            self.player_vel = "top"
+            self.count = (self.count + 1) % 2
+        elif input_data == 3:
+            self.rect.y += self.hspeed
+            self.player_vel = "down"
+            self.count = (self.count + 1) % 2
+        if input_data == 4 and self.bullet is None and self.kd <= 0:
+            if self.player_vel == "down":
+                vx, vy = 0, 1
+            elif self.player_vel == "top":
+                vx, vy = 0, -1
+            elif self.player_vel == "left":
+                vx, vy = -1, 0
+            elif self.player_vel == "right":
+                vx, vy = 1, 0
+            self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy, self.damage)
+            self.kd = 10
+        elif self.bullet and not self.bullet.live:
+            self.bullet = None
+        if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, borders_group) or \
+                pygame.sprite.spritecollideany(self, enemy_group):
+            self.rect.x, self.rect.y = self.x, self.y
+        else:
+            self.x, self.y = self.rect.x, self.rect.y
+        if self.kd > 0:
+            self.kd -= 1
+        self.draw()
+
+    def get_data(self):
         pass
+
 
 
 class Label(pygame.sprite.Sprite):
