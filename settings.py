@@ -53,6 +53,8 @@ base_group = pygame.sprite.Group()
 spawn_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 screen = pygame.display.set_mode(SIZE)
+enemys = []
+nets = []
 blocks = ["#", "$", "W", "B"]
 
 #              [hp, damage, wspeed, hspeed]

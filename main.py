@@ -1,4 +1,5 @@
 import settings
+import neat
 from classes import *
 
 
@@ -230,10 +231,12 @@ pygame.display.set_caption('Танчики')
 clock = pygame.time.Clock()
 
 
-def game(*args):
+def game(genomes, config):
     settings.screen.fill((0, 0, 0))
+    enemys.clear()
     borders_group.empty()
     ui_group.empty()
+    spawn_group.empty()
     enemy_group.empty()
     tiles_group.empty()
     all_sprites.empty()
@@ -242,6 +245,8 @@ def game(*args):
     unbreak_group.empty()
     player_group.empty()
     bullet_group.empty()
+
+    output = 0
 
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
@@ -256,6 +261,22 @@ def game(*args):
             if event.type == pygame.USEREVENT:
                 end_game = True
                 pygame.time.set_timer(pygame.USEREVENT, 0)
+        if settings.enemys:
+            # init genomes
+            for i, g in genomes:
+                net = neat.nn.FeedForwardNetwork.create(g, config)
+                nets.append(net)
+                g.fitness = 0  # every genome is not successful at the start
+
+            for i, tank in enumerate(enemys):
+                outputs = nets[i].activate(tank.get_data())
+                output = outputs.index(max(outputs))
+
+            # now, update tank and set fitness (for alive tanks only)
+            for i, tank in enumerate(enemys):
+                if tank.is_alive:
+                    tank.update(output)
+                    genomes[i][1].fitness += tank.get_reward()  # new fitness (aka tank instance success)
         if settings.pause:
             pause()
         if player.hp <= 0 or base.hp <= 0:
@@ -272,4 +293,12 @@ def game(*args):
 
 
 if __name__ == '__main__':
+    config_path = "./config-feedforward.txt"
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
+                                neat.DefaultStagnation, config_path)
+
+    # init NEAT
+    p = neat.Population(config)
+
+    p.run(game, 1000)
     menu()
