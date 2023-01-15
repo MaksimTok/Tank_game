@@ -294,7 +294,7 @@ class EnemyTank(pygame.sprite.Sprite):
         elif self.bullet and not self.bullet.live:
             self.bullet = None
         if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, borders_group) or \
-                pygame.sprite.spritecollideany(self, player_group) or pygame.sprite.spritecollideany(self, enemy_group):
+                pygame.sprite.spritecollideany(self, player_group):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
