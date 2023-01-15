@@ -54,6 +54,7 @@ spawn_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 screen = pygame.display.set_mode(SIZE)
 enemys = []
+max_count_of_enemys = 5
 nets = []
 blocks = ["#", "$", "W", "B"]
 
