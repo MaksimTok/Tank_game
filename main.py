@@ -248,6 +248,7 @@ def game(genomes, config):
 
     output = 0
 
+    respawn_count = 3
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
     end_game = False
@@ -279,7 +280,10 @@ def game(genomes, config):
                     genomes[i][1].fitness += tank.get_reward()  # new fitness (aka tank instance success)
         if settings.pause:
             pause()
-        if player.hp <= 0 or base.hp <= 0:
+        if player.hp <= 0 and respawn_count > 0:
+            respawn_count -= 1
+            player.respawn()
+        if player.hp <= 0 and respawn_count <= 0 or base.hp <= 0:
             settings.game_over = True
             game_over("Вы Проиграли")
         if end_game:
