@@ -207,6 +207,7 @@ class Base(pygame.sprite.Sprite):
 
     def update(self, *args):
         if self.hp <= 0:
+            self.hp = 0
             self.image = load_image('Blocks/fall_base.png')
 
 

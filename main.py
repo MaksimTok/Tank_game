@@ -1,3 +1,5 @@
+import pygame.color
+
 import settings
 import neat
 from classes import *
@@ -194,6 +196,20 @@ def menu(*args):
         pygame.display.flip()
         clock.tick(fps)
 
+def ui(player, base):
+    ui_group.empty()
+
+    Label("Time:", pygame.Color("orange"), 575, 5, 30)
+    Label(str(settings.time), pygame.Color("orange"), 575, 55, 30)
+
+    Label("Hp:", pygame.Color("orange"), 10, 5, 30)
+    Label(str(player.hp), pygame.Color("orange"), 10, 55, 30)
+
+    Label("Respawn:", pygame.Color("orange"), 10, 625, 30)
+    Label(str(settings.respawn), pygame.Color("orange"), 10, 675, 30)
+
+    Label("Base Hp:", pygame.Color("orange"), 530, 625, 30)
+    Label(str(base.hp), pygame.Color("orange"), 530, 675, 30)
 
 def generate_level(level):
     Border(-5, -5, WIDTH, -5)
@@ -248,11 +264,11 @@ def game(genomes, config):
 
     output = 0
 
-    respawn_count = 3
+    settings.time = 100 # 100 seconds
+    settings.respawn = 3
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
-    end_game = False
-    pygame.time.set_timer(pygame.USEREVENT, 100000)  # 100 second
+    pygame.time.set_timer(pygame.USEREVENT, 1000)  # 100 second
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -260,8 +276,7 @@ def game(genomes, config):
             if event.type == pygame.KEYDOWN and event.key == 27:
                 settings.pause = not settings.pause
             if event.type == pygame.USEREVENT:
-                end_game = True
-                pygame.time.set_timer(pygame.USEREVENT, 0)
+                settings.time -= 1
         if settings.enemys:
             # init genomes
             for i, g in genomes:
@@ -280,19 +295,34 @@ def game(genomes, config):
                     genomes[i][1].fitness += tank.get_reward()  # new fitness (aka tank instance success)
         if settings.pause:
             pause()
-        if player.hp <= 0 and respawn_count > 0:
-            respawn_count -= 1
+        if player.hp <= 0 and settings.respawn > 0:
+            settings.respawn -= 1
             player.respawn()
-        if player.hp <= 0 and respawn_count <= 0 or base.hp <= 0:
+        if player.hp <= 0 and settings.respawn <= 0 or base.hp <= 0:
+            settings.screen.fill((0, 0, 0))
+            all_sprites.update()
+            all_sprites.draw(screen)
+            ui(player, base)
+            ui_group.update()
+            ui_group.draw(screen)
             settings.game_over = True
             game_over("Вы Проиграли")
-        if end_game:
+        if settings.time <= 0:
+            settings.screen.fill((0, 0, 0))
+            all_sprites.update()
+            all_sprites.draw(screen)
+            ui(player, base)
+            ui_group.update()
+            ui_group.draw(screen)
             settings.game_over = True
             game_over("Вы Выиграли")
         settings.screen.fill((0, 0, 0))
         all_sprites.update()
         clock.tick(fps)
         all_sprites.draw(screen)
+        ui(player, base)
+        ui_group.update()
+        ui_group.draw(screen)
         pygame.display.flip()
 
 
