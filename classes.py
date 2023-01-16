@@ -1,8 +1,10 @@
-from inspect import isfunction
 from random import randint
-from settings import *
-from main import game, p
+from random import randint
+
 import pygame.sprite
+
+from main import p
+from settings import *
 
 
 class Leafs(pygame.sprite.Sprite):
@@ -27,7 +29,7 @@ class Brick(pygame.sprite.Sprite):
 
     def update(self, *args):
         if self.hp <= 0 and round(self.count) < 3:
-            self.image = Brick.destroy[round( self.count)]
+            self.image = Brick.destroy[round(self.count)]
             self.count += 0.5
         if round(self.count) >= 3:
             self.kill()
@@ -79,7 +81,6 @@ class Tank(pygame.sprite.Sprite):
             tile_width * self.start_x, tile_height * self.start_y)
         self.x, self.y = self.rect.x, self.rect.y
 
-
     def draw(self):
         if self.spawn_kd > 0:
             self.count = 0 if round(self.count) >= len(self.respawn_image) else self.count
@@ -119,11 +120,13 @@ class Tank(pygame.sprite.Sprite):
                     vx, vy = -1, 0
                 elif self.player_vel == "right":
                     vx, vy = 1, 0
-                self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy, self.damage)
+                self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy,
+                                     self.damage)
                 self.kd = 10
             elif self.bullet and not self.bullet.live:
                 self.bullet = None
-            if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, borders_group) or \
+            if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self,
+                                                                                                   borders_group) or \
                     pygame.sprite.spritecollideany(self, enemy_group):
                 self.rect.x, self.rect.y = self.x, self.y
             else:

@@ -1,6 +1,13 @@
-import settings
 import neat
+
+import settings
 from classes import *
+
+
+def terminate():
+    config.save('config-feedforward.txt')
+    pygame.quit()
+    sys.exit()
 
 
 def game_over(state):
@@ -194,6 +201,7 @@ def menu(*args):
         pygame.display.flip()
         clock.tick(fps)
 
+
 def ui(player, base):
     ui_group.empty()
 
@@ -208,6 +216,7 @@ def ui(player, base):
 
     Label("Base Hp:", pygame.Color("orange"), 530, 625, 30)
     Label(str(base.hp), pygame.Color("orange"), 530, 675, 30)
+
 
 def generate_level(level):
     Border(-5, -5, WIDTH, -5)
@@ -262,7 +271,8 @@ def game(genomes, config):
 
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
-    pygame.time.set_timer(pygame.USEREVENT, 1000)  # 100 second
+    settings.time = 100
+    pygame.time.set_timer(pygame.USEREVENT, settings.time * 10)  # 100 second
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -280,19 +290,20 @@ def game(genomes, config):
 
             for i, tank in enumerate(enemys):
                 tank.output = nets[i].activate(tank.get_data())
-                #tank.output = outputs.index(max(outputs))
-                print(nets[i].activate(tank.get_data()))
+                # tank.output = outputs.index(max(outputs))
 
             # now, update tank and set fitness (for alive tanks only)
             for i, tank in enumerate(enemys):
                 if tank.is_alive:
                     tank.update()
                     if base.hp <= 0:
-                        genomes[i][1].fitness += tank.get_reward(count=10)  # new fitness (aka tank instance success)
+                        genomes[i][1].fitness += tank.get_reward(count=50)  # new fitness (aka tank instance success)
                     elif player.hp <= 0:
-                        genomes[i][1].fitness += tank.get_reward(count=5)
+                        genomes[i][1].fitness += tank.get_reward(count=10)
                     else:
                         genomes[i][1].fitness += tank.get_reward(count=-1)
+                else:
+                    genomes[i][1].fitness += tank.get_reward(count=-10)
         if settings.pause:
             pause()
         if player.hp <= 0 and settings.respawn > 0:
@@ -331,7 +342,6 @@ config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.D
                             neat.DefaultStagnation, config_path)
 # init NEAT
 p = neat.Population(config)
-
 
 if __name__ == '__main__':
     menu()

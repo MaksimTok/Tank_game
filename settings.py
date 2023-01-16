@@ -1,12 +1,6 @@
 import os
 import sys
-
 import pygame
-
-
-def terminate():
-    pygame.quit()
-    sys.exit()
 
 
 def load_image(name, colorkey=None):
@@ -41,7 +35,7 @@ map_id = 1
 pause = False
 game_over = False
 respawn = 3
-time = 100 #100 seconds
+time = 100  # 100 seconds
 tile_width, tile_height = 45, 48
 all_sprites = pygame.sprite.Group()
 brick_group = pygame.sprite.Group()
