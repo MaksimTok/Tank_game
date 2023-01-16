@@ -1,8 +1,5 @@
 from random import randint
-from random import randint
-
 import pygame.sprite
-
 from main import p
 from settings import *
 
@@ -173,6 +170,9 @@ class Bullet(pygame.sprite.Sprite):
             brick.hp -= self.damage
             self.kill()
             self.live = False
+        elif pygame.sprite.spritecollideany(self, unbreak_group):
+            self.kill()
+            self.live = False
         elif base := pygame.sprite.spritecollideany(self, base_group):
             base.hp -= self.damage
             self.kill()
@@ -283,7 +283,7 @@ class EnemyTank(pygame.sprite.Sprite):
             self.rect.y += self.hspeed // 3
             self.vel = "down"
             self.count = (self.count + 1) % 2
-        if moved == 4 and self.bullet is None and self.kd <= 0:
+        if self.bullet is None and self.kd <= 0:
             if self.vel == "down":
                 vx, vy = 0, 1
             elif self.vel == "top":
@@ -310,24 +310,33 @@ class EnemyTank(pygame.sprite.Sprite):
         is_block = 0
         rects = [elem.rect for elem in tiles_group.sprites()] + [elem.rect for elem in enemy_group.sprites()] + [
             elem.rect for elem in player_group.sprites()]
+        if self.vel == "down":
+            vector = 0
+        elif self.vel == "top":
+            vector = 1
+        elif self.vel == "left":
+            vector = 2
+        elif self.vel == "right":
+            vector = 3
         if self.bullet:
             is_bullet = 1
         for elem in rects:
-            if self.vel == 'top' and self.rect.collidepoint(self.rect.x, self.rect.y - 1):
+            if self.vel == 'top' and elem.collidepoint(self.rect.x, self.rect.y - 1):
                 is_block = 1
                 break
-            elif self.vel == 'down' and self.rect.collidepoint(self.rect.x, self.rect.y + 1):
+            elif self.vel == 'down' and elem.collidepoint(self.rect.x, self.rect.y + 1):
                 is_block = 1
                 break
-            elif self.vel == 'right' and self.rect.collidepoint(self.rect.x + 1, self.rect.y):
+            elif self.vel == 'right' and elem.collidepoint(self.rect.x + 1, self.rect.y):
                 is_block = 1
                 break
-            elif self.vel == 'left' and self.rect.collidepoint(self.rect.x - 1, self.rect.y):
+            elif self.vel == 'left' and elem.collidepoint(self.rect.x - 1, self.rect.y):
                 is_block = 1
                 break
         return [player_group.sprites()[0].rect[0] // tile_width, player_group.sprites()[0].rect[1] // tile_height,
                 base_group.sprites()[0].rect[0] // tile_width, base_group.sprites()[0].rect[1] // tile_height,
-                is_block, is_bullet]
+                self.rect[0] // tile_width, self.rect[1] // tile_height,
+                is_block, is_bullet, vector]
 
     def get_reward(self, count=1):
         return count

@@ -1,5 +1,4 @@
 import neat
-
 import settings
 from classes import *
 
@@ -272,6 +271,7 @@ def game(genomes, config):
     board = load_level(settings.maps[settings.map_id - 1])
     player, base = generate_level(board)
     settings.time = 100
+    settings.respawn = 3
     pygame.time.set_timer(pygame.USEREVENT, settings.time * 10)  # 100 second
     while True:
         for event in pygame.event.get():
@@ -338,8 +338,11 @@ def game(genomes, config):
 
 
 config_path = "./config-feedforward.txt"
+#config_path2 = "./config-feedforward2.txt"
 config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
                             neat.DefaultStagnation, config_path)
+#config2 = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
+#                             neat.DefaultStagnation, config_path2)
 # init NEAT
 p = neat.Population(config)
 
