@@ -5,7 +5,7 @@ from settings import *
 
 
 class Leafs(pygame.sprite.Sprite):
-    image = load_image('Blocks/leafs.png')
+    image = load_image("Blocks/leafs.png")
 
     def __init__(self, pos_x, pos_y):
         super().__init__(all_sprites)
@@ -14,8 +14,12 @@ class Leafs(pygame.sprite.Sprite):
 
 
 class Brick(pygame.sprite.Sprite):
-    image = load_image('Blocks/brick.png')
-    destroy = [load_image("Effects/boom1.png"), load_image("Effects/boom2.png"), load_image("Effects/boom3.png")]
+    image = load_image("Blocks/brick.png")
+    destroy = [
+        load_image("Effects/boom1.png"),
+        load_image("Effects/boom2.png"),
+        load_image("Effects/boom3.png"),
+    ]
 
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, brick_group, all_sprites)
@@ -33,7 +37,7 @@ class Brick(pygame.sprite.Sprite):
 
 
 class Unbreak(pygame.sprite.Sprite):
-    image = load_image('Blocks/unbreak.png')
+    image = load_image("Blocks/unbreak.png")
 
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, unbreak_group, all_sprites)
@@ -47,23 +51,37 @@ class Tank(pygame.sprite.Sprite):
         self.start_x, self.start_y = pos_x, pos_y
         self.tank_type = tank_type
         self.player_vel = "top"
-        self.player_image = {"top": [load_image(f'Tanks/Player/Type{self.tank_type}/top1.png'),
-                                     load_image(f'Tanks/Player/Type{self.tank_type}/top2.png')],
-                             "down": [load_image(f'Tanks/Player/Type{self.tank_type}/down1.png'),
-                                      load_image(f'Tanks/Player/Type{self.tank_type}/down2.png')],
-                             "left": [load_image(f'Tanks/Player/Type{self.tank_type}/left1.png'),
-                                      load_image(f'Tanks/Player/Type{self.tank_type}/left2.png')],
-                             "right": [load_image(f'Tanks/Player/Type{self.tank_type}/right1.png'),
-                                       load_image(f'Tanks/Player/Type{self.tank_type}/right2.png')]}
-        self.respawn_image = [load_image("Effects/spawn1.png"), load_image("Effects/spawn2.png"),
-                              load_image("Effects/spawn3.png"), load_image("Effects/spawn4.png"),
-                              load_image("Effects/spawn5.png"), load_image("Effects/spawn6.png")]
+        self.player_image = {
+            "top": [
+                load_image(f"Tanks/Player/Type{self.tank_type}/top1.png"),
+                load_image(f"Tanks/Player/Type{self.tank_type}/top2.png"),
+            ],
+            "down": [
+                load_image(f"Tanks/Player/Type{self.tank_type}/down1.png"),
+                load_image(f"Tanks/Player/Type{self.tank_type}/down2.png"),
+            ],
+            "left": [
+                load_image(f"Tanks/Player/Type{self.tank_type}/left1.png"),
+                load_image(f"Tanks/Player/Type{self.tank_type}/left2.png"),
+            ],
+            "right": [
+                load_image(f"Tanks/Player/Type{self.tank_type}/right1.png"),
+                load_image(f"Tanks/Player/Type{self.tank_type}/right2.png"),
+            ],
+        }
+        self.respawn_image = [
+            load_image("Effects/spawn1.png"),
+            load_image("Effects/spawn2.png"),
+            load_image("Effects/spawn3.png"),
+            load_image("Effects/spawn4.png"),
+            load_image("Effects/spawn5.png"),
+            load_image("Effects/spawn6.png"),
+        ]
         self.count = 0
         self.kd = 10
         self.spawn_kd = 0
         self.image = self.player_image[self.player_vel][self.count]
-        self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
         self.x, self.y = self.rect.x, self.rect.y
         self.bullet = None
         self.hp, self.damage, self.wspeed, self.hspeed = tank_settings[tank_type]
@@ -75,12 +93,15 @@ class Tank(pygame.sprite.Sprite):
         self.spawn_kd = 10
         self.image = self.player_image[self.player_vel][self.count]
         self.rect = self.image.get_rect().move(
-            tile_width * self.start_x, tile_height * self.start_y)
+            tile_width * self.start_x, tile_height * self.start_y
+        )
         self.x, self.y = self.rect.x, self.rect.y
 
     def draw(self):
         if self.spawn_kd > 0:
-            self.count = 0 if round(self.count) >= len(self.respawn_image) else self.count
+            self.count = (
+                0 if round(self.count) >= len(self.respawn_image) else self.count
+            )
             self.image = self.respawn_image[round(self.count)]
         else:
             self.image = self.player_image[self.player_vel][round(self.count)]
@@ -117,14 +138,22 @@ class Tank(pygame.sprite.Sprite):
                     vx, vy = -1, 0
                 elif self.player_vel == "right":
                     vx, vy = 1, 0
-                self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy,
-                                     self.damage)
+                self.bullet = Bullet(
+                    self,
+                    self.x + tile_width // 2 - 3,
+                    self.y + tile_height // 2 - 3,
+                    vx,
+                    vy,
+                    self.damage,
+                )
                 self.kd = 10
             elif self.bullet and not self.bullet.live:
                 self.bullet = None
-            if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self,
-                                                                                                   borders_group) or \
-                    pygame.sprite.spritecollideany(self, enemy_group):
+            if (
+                pygame.sprite.spritecollideany(self, tiles_group)
+                or pygame.sprite.spritecollideany(self, borders_group)
+                or pygame.sprite.spritecollideany(self, enemy_group)
+            ):
                 self.rect.x, self.rect.y = self.x, self.y
             else:
                 self.x, self.y = self.rect.x, self.rect.y
@@ -143,25 +172,31 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__(bullet_group, all_sprites)
         self.parent = parent
         if vel_x == 0 and vel_y == 1:
-            self.image = load_image('Tanks/Bullet/bullet_down.png')
+            self.image = load_image("Tanks/Bullet/bullet_down.png")
         elif vel_x == 0 and vel_y == -1:
-            self.image = load_image('Tanks/Bullet/bullet_top.png')
+            self.image = load_image("Tanks/Bullet/bullet_top.png")
         elif vel_x == -1 and vel_y == 0:
-            self.image = load_image('Tanks/Bullet/bullet_left.png')
+            self.image = load_image("Tanks/Bullet/bullet_left.png")
         elif vel_x == 1 and vel_y == 0:
-            self.image = load_image('Tanks/Bullet/bullet_right.png')
+            self.image = load_image("Tanks/Bullet/bullet_right.png")
         self.damage = damage
         self.vx, self.vy = vel_x, vel_y
-        self.rect = self.image.get_rect().move(pos_x + (tile_width // 2 * vel_x), pos_y + (tile_height // 2 * vel_y))
+        self.rect = self.image.get_rect().move(
+            pos_x + (tile_width // 2 * vel_x), pos_y + (tile_height // 2 * vel_y)
+        )
 
     def update(self, *args):
         self.rect.x += self.vx * 20
         self.rect.y += self.vy * 20
-        if (player := pygame.sprite.spritecollideany(self, player_group)) and player != self.parent:
+        if (
+            player := pygame.sprite.spritecollideany(self, player_group)
+        ) and player != self.parent:
             player.hp -= self.damage
             self.kill()
             self.live = False
-        if (enemy := pygame.sprite.spritecollideany(self, enemy_group)) and enemy != self.parent:
+        if (
+            enemy := pygame.sprite.spritecollideany(self, enemy_group)
+        ) and enemy != self.parent:
             enemy.hp -= self.damage
             enemy.is_alive = False
             self.kill()
@@ -177,13 +212,17 @@ class Bullet(pygame.sprite.Sprite):
             base.hp -= self.damage
             self.kill()
             self.live = False
-        elif self.rect.x < 0 or self.rect.x > WIDTH or self.rect.y < 0 or self.rect.y > HEIGHT:
+        elif (
+            self.rect.x < 0
+            or self.rect.x > WIDTH
+            or self.rect.y < 0
+            or self.rect.y > HEIGHT
+        ):
             self.kill()
             self.live = False
 
 
 class Button(pygame.sprite.Sprite):
-
     def __init__(self, text, color, pos_x, pos_y, size=30):
         super().__init__(ui_group)
         self.name = text
@@ -198,7 +237,9 @@ class Button(pygame.sprite.Sprite):
         self.args = args
 
     def update(self, *args):
-        if pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pygame.mouse.get_pos()):
+        if pygame.mouse.get_pressed()[0] and self.rect.collidepoint(
+            pygame.mouse.get_pos()
+        ):
             if self.args is not None:
                 p.run(*self.args)
             else:
@@ -208,14 +249,14 @@ class Button(pygame.sprite.Sprite):
 class Base(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, base_group, all_sprites)
-        self.image = load_image('Blocks/base.png')
+        self.image = load_image("Blocks/base.png")
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
         self.hp = 100
 
     def update(self, *args):
         if self.hp <= 0:
             self.hp = 0
-            self.image = load_image('Blocks/fall_base.png')
+            self.image = load_image("Blocks/fall_base.png")
 
 
 class SpawnPoint(pygame.sprite.Sprite):
@@ -231,7 +272,13 @@ class SpawnPoint(pygame.sprite.Sprite):
             if tank.rect.colliderect(self.rect):
                 is_free = False
         if is_free and randint(0, 50) == 1 and len(enemys) <= max_count_of_enemys:
-            enemys.append(EnemyTank(self.rect[0] // tile_width, self.rect[1] // tile_height, randint(1, 7)))
+            enemys.append(
+                EnemyTank(
+                    self.rect[0] // tile_width,
+                    self.rect[1] // tile_height,
+                    randint(1, 7),
+                )
+            )
 
 
 class EnemyTank(pygame.sprite.Sprite):
@@ -239,21 +286,30 @@ class EnemyTank(pygame.sprite.Sprite):
         super().__init__(enemy_group, all_sprites)
         self.tank_type = tank_type
         self.vel = "down"
-        self.player_image = {"top": [load_image(f'Tanks/Enemy/Type{self.tank_type}/top1.png'),
-                                     load_image(f'Tanks/Enemy/Type{self.tank_type}/top2.png')],
-                             "down": [load_image(f'Tanks/Enemy/Type{self.tank_type}/down1.png'),
-                                      load_image(f'Tanks/Enemy/Type{self.tank_type}/down2.png')],
-                             "left": [load_image(f'Tanks/Enemy/Type{self.tank_type}/left1.png'),
-                                      load_image(f'Tanks/Enemy/Type{self.tank_type}/left2.png')],
-                             "right": [load_image(f'Tanks/Enemy/Type{self.tank_type}/right1.png'),
-                                       load_image(f'Tanks/Enemy/Type{self.tank_type}/right2.png')]}
+        self.player_image = {
+            "top": [
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/top1.png"),
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/top2.png"),
+            ],
+            "down": [
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/down1.png"),
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/down2.png"),
+            ],
+            "left": [
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/left1.png"),
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/left2.png"),
+            ],
+            "right": [
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/right1.png"),
+                load_image(f"Tanks/Enemy/Type{self.tank_type}/right2.png"),
+            ],
+        }
         self.count = 0
         self.output = []
         self.is_alive = True
         self.kd = 10
         self.image = self.player_image[self.vel][self.count]
-        self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
         self.x, self.y = self.rect.x, self.rect.y
         self.bullet = None
         self.hp, self.damage, self.wspeed, self.hspeed = tank_settings[tank_type]
@@ -292,12 +348,22 @@ class EnemyTank(pygame.sprite.Sprite):
                 vx, vy = -1, 0
             elif self.vel == "right":
                 vx, vy = 1, 0
-            self.bullet = Bullet(self, self.x + tile_width // 2 - 3, self.y + tile_height // 2 - 3, vx, vy, self.damage)
+            self.bullet = Bullet(
+                self,
+                self.x + tile_width // 2 - 3,
+                self.y + tile_height // 2 - 3,
+                vx,
+                vy,
+                self.damage,
+            )
             self.kd = 10
         elif self.bullet and not self.bullet.live:
             self.bullet = None
-        if pygame.sprite.spritecollideany(self, tiles_group) or pygame.sprite.spritecollideany(self, borders_group) or \
-                pygame.sprite.spritecollideany(self, player_group):
+        if (
+            pygame.sprite.spritecollideany(self, tiles_group)
+            or pygame.sprite.spritecollideany(self, borders_group)
+            or pygame.sprite.spritecollideany(self, player_group)
+        ):
             self.rect.x, self.rect.y = self.x, self.y
         else:
             self.x, self.y = self.rect.x, self.rect.y
@@ -308,8 +374,11 @@ class EnemyTank(pygame.sprite.Sprite):
     def get_data(self):
         is_bullet = 0
         is_block = 0
-        rects = [elem.rect for elem in tiles_group.sprites()] + [elem.rect for elem in enemy_group.sprites()] + [
-            elem.rect for elem in player_group.sprites()]
+        rects = (
+            [elem.rect for elem in tiles_group.sprites()]
+            + [elem.rect for elem in enemy_group.sprites()]
+            + [elem.rect for elem in player_group.sprites()]
+        )
         if self.vel == "down":
             vector = 0
         elif self.vel == "top":
@@ -321,29 +390,37 @@ class EnemyTank(pygame.sprite.Sprite):
         if self.bullet:
             is_bullet = 1
         for elem in rects:
-            if self.vel == 'top' and elem.collidepoint(self.rect.x, self.rect.y - 1):
+            if self.vel == "top" and elem.collidepoint(self.rect.x, self.rect.y - 1):
                 is_block = 1
                 break
-            elif self.vel == 'down' and elem.collidepoint(self.rect.x, self.rect.y + 1):
+            elif self.vel == "down" and elem.collidepoint(self.rect.x, self.rect.y + 1):
                 is_block = 1
                 break
-            elif self.vel == 'right' and elem.collidepoint(self.rect.x + 1, self.rect.y):
+            elif self.vel == "right" and elem.collidepoint(
+                self.rect.x + 1, self.rect.y
+            ):
                 is_block = 1
                 break
-            elif self.vel == 'left' and elem.collidepoint(self.rect.x - 1, self.rect.y):
+            elif self.vel == "left" and elem.collidepoint(self.rect.x - 1, self.rect.y):
                 is_block = 1
                 break
-        return [player_group.sprites()[0].rect[0] // tile_width, player_group.sprites()[0].rect[1] // tile_height,
-                base_group.sprites()[0].rect[0] // tile_width, base_group.sprites()[0].rect[1] // tile_height,
-                self.rect[0] // tile_width, self.rect[1] // tile_height,
-                is_block, is_bullet, vector]
+        return [
+            player_group.sprites()[0].rect[0] // tile_width,
+            player_group.sprites()[0].rect[1] // tile_height,
+            base_group.sprites()[0].rect[0] // tile_width,
+            base_group.sprites()[0].rect[1] // tile_height,
+            self.rect[0] // tile_width,
+            self.rect[1] // tile_height,
+            is_block,
+            is_bullet,
+            vector,
+        ]
 
     def get_reward(self, count=1):
         return count
 
 
 class Label(pygame.sprite.Sprite):
-
     def __init__(self, text, color, pos_x, pos_y, size=30):
         super().__init__(ui_group)
         self.name = text
