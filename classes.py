@@ -262,7 +262,8 @@ class Base(pygame.sprite.Sprite):
 class SpawnPoint(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(spawn_group, all_sprites)
-        self.image = pygame.Surface((45, 48))
+        self.image = pygame.Surface((45, 48)).convert_alpha()
+        self.image.fill((0, 0, 0, 0))
         self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
 
     def update(self, *args):
@@ -283,7 +284,7 @@ class SpawnPoint(pygame.sprite.Sprite):
 
 class EnemyTank(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, tank_type):
-        super().__init__(enemy_group, all_sprites)
+        super().__init__(enemy_group)
         self.tank_type = tank_type
         self.vel = "down"
         self.player_image = {
@@ -322,47 +323,50 @@ class EnemyTank(pygame.sprite.Sprite):
         if self.hp <= 0:
             self.kill()
             enemys.remove(self)
-        moved = self.output.index(max(self.output))
-        if moved == 0:
-            self.rect.x -= self.wspeed // 3
-            self.vel = "left"
-            self.count = (self.count + 1) % 2
-        elif moved == 1:
-            self.rect.x += self.wspeed // 3
-            self.vel = "right"
-            self.count = (self.count + 1) % 2
-        elif moved == 2:
-            self.rect.y -= self.hspeed // 3
-            self.vel = "top"
-            self.count = (self.count + 1) % 2
-        elif moved == 3:
-            self.rect.y += self.hspeed // 3
-            self.vel = "down"
-            self.count = (self.count + 1) % 2
-        if self.bullet is None and self.kd <= 0:
-            if self.vel == "down":
-                vx, vy = 0, 1
-            elif self.vel == "top":
-                vx, vy = 0, -1
-            elif self.vel == "left":
-                vx, vy = -1, 0
-            elif self.vel == "right":
-                vx, vy = 1, 0
-            self.bullet = Bullet(
-                self,
-                self.x + tile_width // 2 - 3,
-                self.y + tile_height // 2 - 3,
-                vx,
-                vy,
-                self.damage,
-            )
-            self.kd = 10
-        elif self.bullet and not self.bullet.live:
-            self.bullet = None
+        if self.output:
+            moved = self.output.index(max(self.output))
+            if moved == 0:
+                self.rect.x -= self.wspeed // 3
+                self.vel = "left"
+                self.count = (self.count + 1) % 2
+            elif moved == 1:
+                self.rect.x += self.wspeed // 3
+                self.vel = "right"
+                self.count = (self.count + 1) % 2
+            elif moved == 2:
+                self.rect.y -= self.hspeed // 3
+                self.vel = "top"
+                self.count = (self.count + 1) % 2
+            elif moved == 3:
+                self.rect.y += self.hspeed // 3
+                self.vel = "down"
+                self.count = (self.count + 1) % 2
+            if self.bullet is None and self.kd <= 0:
+                if self.vel == "down":
+                    vx, vy = 0, 1
+                elif self.vel == "top":
+                    vx, vy = 0, -1
+                elif self.vel == "left":
+                    vx, vy = -1, 0
+                elif self.vel == "right":
+                    vx, vy = 1, 0
+                self.bullet = Bullet(
+                    self,
+                    self.x + tile_width // 2 - 3,
+                    self.y + tile_height // 2 - 3,
+                    vx,
+                    vy,
+                    self.damage,
+                )
+                self.kd = 10
+            elif self.bullet and not self.bullet.live:
+                self.bullet = None
         if (
             pygame.sprite.spritecollideany(self, tiles_group)
             or pygame.sprite.spritecollideany(self, borders_group)
             or pygame.sprite.spritecollideany(self, player_group)
+            or (enemy := pygame.sprite.spritecollideany(self, enemy_group))
+            and enemy is not self
         ):
             self.rect.x, self.rect.y = self.x, self.y
         else:

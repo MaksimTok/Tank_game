@@ -215,7 +215,7 @@ def menu(*args):
     Label("Танчики", pygame.Color("orange"), 20, 100, 90)
 
     start_btn = Button("Начать", pygame.Color("orange"), 50, 300)
-    start_btn.onclick(p.run, (game, 10))
+    start_btn.onclick(p.run, (game, 1000))
 
     tank_type_btn = Button("Выбрать танк", pygame.Color("orange"), 50, 375)
     tank_type_btn.onclick(tank_type)
@@ -326,20 +326,15 @@ def game(genomes, config):
             for i, g in genomes:
                 net = neat.nn.FeedForwardNetwork.create(g, config)
                 nets.append(net)
-                g.fitness = 0  # every genome is not successful at the start
+                g.fitness = 0
 
             for i, tank in enumerate(enemys):
                 tank.output = nets[i].activate(tank.get_data())
-                # tank.output = outputs.index(max(outputs))
-
-            # now, update tank and set fitness (for alive tanks only)
             for i, tank in enumerate(enemys):
                 if tank.is_alive:
                     tank.update()
                     if base.hp <= 0:
-                        genomes[i][1].fitness += tank.get_reward(
-                            count=50
-                        )  # new fitness (aka tank instance success)
+                        genomes[i][1].fitness += tank.get_reward(count=50)
                     elif player.hp <= 0:
                         genomes[i][1].fitness += tank.get_reward(count=10)
                     else:
@@ -354,33 +349,42 @@ def game(genomes, config):
         if player.hp <= 0 and settings.respawn <= 0 or base.hp <= 0:
             settings.screen.fill((0, 0, 0))
             all_sprites.update()
+            enemy_group.update()
+            enemy_group.draw(screen)
             all_sprites.draw(screen)
             ui(player, base)
             ui_group.update()
             ui_group.draw(screen)
             settings.game_over = True
+            print("Lose")
+            return
             game_over("Вы Проиграли")
         if settings.time <= 0:
             settings.screen.fill((0, 0, 0))
             all_sprites.update()
+            enemy_group.update()
+            enemy_group.draw(screen)
             all_sprites.draw(screen)
             ui(player, base)
             ui_group.update()
             ui_group.draw(screen)
             settings.game_over = True
+            print("win")
+            return
             game_over("Вы Выиграли")
         settings.screen.fill((0, 0, 0))
         all_sprites.update()
-        clock.tick(fps)
+        enemy_group.update()
+        enemy_group.draw(screen)
         all_sprites.draw(screen)
         ui(player, base)
         ui_group.update()
         ui_group.draw(screen)
+        clock.tick(fps)
         pygame.display.flip()
 
 
 config_path = "./config-feedforward.txt"
-# config_path2 = "./config-feedforward2.txt"
 config = neat.config.Config(
     neat.DefaultGenome,
     neat.DefaultReproduction,
