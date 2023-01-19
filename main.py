@@ -215,7 +215,7 @@ def menu(*args):
     Label("Танчики", pygame.Color("orange"), 20, 100, 90)
 
     start_btn = Button("Начать", pygame.Color("orange"), 50, 300)
-    start_btn.onclick(p.run, (game, 1000))
+    start_btn.onclick(p.run, (game, 1))
 
     tank_type_btn = Button("Выбрать танк", pygame.Color("orange"), 50, 375)
     tank_type_btn.onclick(tank_type)
@@ -356,8 +356,6 @@ def game(genomes, config):
             ui_group.update()
             ui_group.draw(screen)
             settings.game_over = True
-            print("Lose")
-            return
             game_over("Вы Проиграли")
         if settings.time <= 0:
             settings.screen.fill((0, 0, 0))
@@ -369,8 +367,6 @@ def game(genomes, config):
             ui_group.update()
             ui_group.draw(screen)
             settings.game_over = True
-            print("win")
-            return
             game_over("Вы Выиграли")
         settings.screen.fill((0, 0, 0))
         all_sprites.update()

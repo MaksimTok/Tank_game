@@ -272,7 +272,7 @@ class SpawnPoint(pygame.sprite.Sprite):
         for tank in all_tanks:
             if tank.rect.colliderect(self.rect):
                 is_free = False
-        if is_free and randint(0, 50) == 1 and len(enemys) <= max_count_of_enemys:
+        if is_free and randint(0, 50) == 1 and len(enemys) < max_count_of_enemys:
             enemys.append(
                 EnemyTank(
                     self.rect[0] // tile_width,
@@ -380,7 +380,8 @@ class EnemyTank(pygame.sprite.Sprite):
         is_block = 0
         rects = (
             [elem.rect for elem in tiles_group.sprites()]
-            + [elem.rect for elem in enemy_group.sprites()]
+            + [elem.rect for elem in borders_group.sprites()]
+            + [elem.rect for elem in enemy_group.sprites() if elem is not self]
             + [elem.rect for elem in player_group.sprites()]
         )
         if self.vel == "down":
@@ -408,6 +409,7 @@ class EnemyTank(pygame.sprite.Sprite):
             elif self.vel == "left" and elem.collidepoint(self.rect.x - 1, self.rect.y):
                 is_block = 1
                 break
+
         return [
             player_group.sprites()[0].rect[0] // tile_width,
             player_group.sprites()[0].rect[1] // tile_height,
